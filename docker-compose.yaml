@@ -1,5 +1,3 @@
-version: '3'
-
 networks:
   eShop:
 
@@ -23,7 +21,7 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - ./:/ap
+      - ./:/app
     environment:
       NODE_ENV: development
       DB_HOST: mysql
