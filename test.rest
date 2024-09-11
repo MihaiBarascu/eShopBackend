@@ -1,0 +1,13 @@
+POST http://localhost:3000/users/
+Content-Type: application/json
+
+{ 
+  "lastName":"ion",
+  "firstName":"ANDREI",
+  "email":"ANDREI@yahoo.com",
+  "password":"new password2222"
+  
+}
+#####################################
+
+DELETE http://localhost:3000/users/
