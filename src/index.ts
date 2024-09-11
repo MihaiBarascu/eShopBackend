@@ -5,10 +5,10 @@ const app = express();
 const port = 3000;
 
 const connection = mysql.createConnection({
-  host: process.env.DB_HOST, // sau 'nume-container' dacă te conectezi din afara containerului
-  user: "root", // utilizatorul MySQL (înlocuiește cu ce utilizator ai)
-  password: "root", // parola pentru utilizatorul MySQL
-  database: process.env.DB_DATABASE, // baza de date la care vrei să te conectezi
+  host: process.env.DB_HOST,
+  user: "root",
+  password: "root",
+  database: process.env.DB_DATABASE,
 });
 
 connection.connect((err) => {
