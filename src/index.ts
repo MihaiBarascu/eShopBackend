@@ -5,88 +5,78 @@ import { AppDataSource } from "./database/data-source";
 import { validateBodyMiddleware } from "./middlewares/validationMiddleware";
 import bcrypt from "bcrypt";
 import { hashPassword } from "./utils/hashPassword";
-
-hashPassword("mihai").then((vall) => {
-  console.log(vall);
-});
-
-const salt = process.env.HASH_SALT;
-console.log(process.env.HASH_SALT);
-dotenv.config();
-
+import { CreateUserDto } from "./dto/user.dto";
+import usersRouter from "./controllers/users";
+import { v4 } from "uuid";
 const app: Express = express();
 
 app.use(express.json());
 
 const port = process.env.PORT || 3000;
 
-AppDataSource.initialize()
-  .then(() => {
-    console.log("Connected to database");
+app.use("/users", usersRouter);
 
-    app.get("/users", async (req: Request, res: Response) => {
-      try {
-        const users = await AppDataSource.getRepository(User).find();
-        res.json(users);
-      } catch (error) {
-        res.status(500).json({ message: "Error getting users", error });
-      }
-    });
+console.log("uid", v4());
 
-    app.get("/users/:id", async (req: Request, res: Response) => {
-      try {
-        const user = await AppDataSource.getRepository(User).findOneBy({
-          id: Number(req.params.id),
-        });
+// app.get("/users", async (req: Request, res: Response) => {
+//   try {
+//     const users = await AppDataSource.getRepository(User).find();
+//     res.json(users);
+//   } catch (error) {
+//     res.status(500).json({ message: "Error getting users", error });
+//   }
+// });
 
-        if (user) {
-          res.json(user);
-        } else {
-          res.status(404).json({ message: "User not found" });
-        }
-      } catch (error) {
-        res.status(500).json({ message: "Error getting user", error });
-      }
-    });
+// app.get("/users/:id", async (req: Request, res: Response) => {
+//   try {
+//     const user = await AppDataSource.getRepository(User).findOneBy({
+//       id: Number(req.params.id),
+//     });
 
-    app.post(
-      "/users",
-      validateBodyMiddleware(User),
-      async (request, response) => {
-        try {
-          const userRepository = AppDataSource.getRepository(User);
-          const user = request.body;
+//     if (user) {
+//       res.json(user);
+//     } else {
+//       res.status(404).json({ message: "User not found" });
+//     }
+//   } catch (error) {
+//     res.status(500).json({ message: "Error getting user", error });
+//   }
+// });
 
-          user.password = await hashPassword(user.password);
+// app.post(
+//   "/users",
+//   validateBodyMiddleware(CreateUserDto),
+//   async (request, response) => {
+//     try {
+//       const userRepository = AppDataSource.getRepository(User);
+//       const user = request.body;
 
-          await userRepository.save(user);
-          response.status(201).json(user);
-        } catch (error) {
-          response.status(500).json({ error });
-        }
-      }
-    );
+//       user.password = await hashPassword(user.password);
 
-    app.delete("/users/:id", async (req: Request, res: Response) => {
-      try {
-        const userRepositor = await AppDataSource.getRepository(User);
+//       await userRepository.save(user);
+//       response.status(201).json(user);
+//     } catch (error) {
+//       response.status(500).json({ error });
+//     }
+//   }
+// );
 
-        const userToRemove = await userRepositor.findOneBy({
-          id: Number(req.params.id),
-        });
-        if (userToRemove) {
-          await userRepositor.remove(userToRemove);
-        }
-        res.status(202).end();
-      } catch (error) {
-        res.status(500).json({ message: "Error getting user", error });
-      }
-    });
+// app.delete("/users/:id", async (req: Request, res: Response) => {
+//   try {
+//     const userRepositor = await AppDataSource.getRepository(User);
 
-    app.listen(port, () => {
-      console.log(`[server]: Server is live at http://localhost:${port}`);
-    });
-  })
-  .catch((error) => {
-    console.error("Error connecting to databse", error);
-  });
+//     const userToRemove = await userRepositor.findOneBy({
+//       id: Number(req.params.id),
+//     });
+//     if (userToRemove) {
+//       await userRepositor.remove(userToRemove);
+//     }
+//     res.status(202).end();
+//   } catch (error) {
+//     res.status(500).json({ message: "Error getting user", error });
+//   }
+// });
+
+app.listen(port, () => {
+  console.log(`[server]: Server is running at http://localhost:${port}`);
+});
