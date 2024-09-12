@@ -13,6 +13,6 @@ export const AppDataSource = new DataSource({
   migrations: ["src/database/migrations/*.{js,ts}"],
   logging: process.env.ORM_LOGGING === "true",
   entities: ["src/database/entity/**/*.{js,ts}"],
-  synchronize: false,
+  synchronize: true,
   subscribers: [],
 });
