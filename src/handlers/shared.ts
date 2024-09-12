@@ -6,10 +6,11 @@ import { AppDataSource } from "../database/data-source";
 function create<T extends object>(type: new () => T) {
   return async (request: Request, response: Response) => {
     try {
-      const repostiry = AppDataSource.getRepository(type);
-      const data = request.body;
-      await repostiry.save(data);
-      response.status(201).json(data);
+      const userRepository = AppDataSource.getRepository(type);
+      const entity = plainToInstance(type, request.body);
+
+      await userRepository.save(entity);
+      response.status(201).json(entity);
     } catch (error) {
       response.status(500).json({ error });
     }

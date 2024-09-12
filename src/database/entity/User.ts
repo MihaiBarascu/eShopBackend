@@ -13,6 +13,7 @@ import {
 import { Length, IsEmail, IsNotEmpty, IsAlpha } from "class-validator";
 import "reflect-metadata";
 import { v4 as uuidv4 } from "uuid";
+import { hash } from "bcrypt";
 
 @Entity()
 export class User {
@@ -31,8 +32,13 @@ export class User {
   @Column({ length: 100, nullable: false, unique: true })
   email: string;
 
-  @Column({ nullable: false })
+  @Column({ type: "text", nullable: false })
   password: string;
+
+  @BeforeInsert()
+  async hashPassword() {
+    this.password = await hash(this.password, 10);
+  }
 
   @BeforeInsert()
   generateUuid() {

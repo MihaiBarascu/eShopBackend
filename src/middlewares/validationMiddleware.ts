@@ -8,7 +8,7 @@ export function validateBodyMiddleware<T extends object>(type: new () => T) {
 
     const errors = await validate(instance);
     if (errors.length > 0) {
-      return response.status(400).json({ errors });
+      return response.status(400).json({ error: errors });
     }
 
     request.body = instance;

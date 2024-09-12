@@ -24,19 +24,7 @@ const getByID = async (request: Request, response: Response) => {
   }
 };
 
-const create = async (request, response) => {
-  try {
-    const userRepository = AppDataSource.getRepository(User);
-    const user = plainToInstance(User, request.body);
-
-    user.password = await hashPassword(user.password);
-
-    await userRepository.save(user);
-    response.status(201).json(user);
-  } catch (error) {
-    response.status(500).json({ error });
-  }
-};
+const create = shared.create(User);
 
 const update = async (request, response) => {
   try {
@@ -45,7 +33,7 @@ const update = async (request, response) => {
     console.log(request.body.id);
 
     const userToUpdate = await userRepository.findOneBy({
-      id: 2,
+      id: request.body.id,
     });
 
     console.log(userToUpdate);
