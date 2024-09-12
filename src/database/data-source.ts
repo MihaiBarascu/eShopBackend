@@ -13,6 +13,14 @@ export const AppDataSource = new DataSource({
   migrations: ["src/database/migrations/*.{js,ts}"],
   logging: process.env.ORM_LOGGING === "true",
   entities: ["src/database/entity/**/*.{js,ts}"],
-  synchronize: false,
+  synchronize: true,
   subscribers: [],
 });
+
+AppDataSource.initialize()
+  .then(() => {
+    console.log("Data Source has been initialized!");
+  })
+  .catch((error) => {
+    console.error("Error during Data Source initialization:", error);
+  });

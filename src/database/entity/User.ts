@@ -1,37 +1,43 @@
-import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  UpdateDateColumn,
+  ManyToMany,
+  JoinTable,
+  BeforeInsert,
+  OneToMany,
+} from "typeorm";
 import { Length, IsEmail, IsNotEmpty, IsAlpha } from "class-validator";
 import "reflect-metadata";
+import { v4 as uuidv4 } from "uuid";
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  @IsAlpha()
-  @Length(3, 20, {
-    message: "First name must be between 3 and 20 characters long.",
-  })
-  @IsNotEmpty({ message: "First name cannot be empty." })
+  @Column({ nullable: true })
+  uuid: string;
+
+  @Column({ length: 100, nullable: false })
   firstName: string;
 
-  @Column()
-  @IsAlpha()
-  @Length(3, 20, {
-    message: "Last name must be between 3 and 20 characters long.",
-  })
-  @IsNotEmpty({ message: "Last name cannot be empty." })
+  @Column({ length: 100, nullable: false })
   lastName: string;
 
-  @Column()
-  @IsEmail({}, { message: "Email must be a valid email address." })
-  @IsNotEmpty({ message: "Email cannot be empty." })
+  @Column({ length: 100, nullable: false, unique: true })
   email: string;
 
-  @Column()
-  @Length(6, 30, {
-    message: "Password must be between 6 and 30 characters long.",
-  })
-  @IsNotEmpty({ message: "Password cannot be empty." })
+  @Column({ nullable: false })
   password: string;
+
+  @BeforeInsert()
+  generateUuid() {
+    // Schimbă numele metodei pentru claritate
+    this.uuid = uuidv4();
+    console.log("Generated UUID: ", this.uuid);
+  }
 }
