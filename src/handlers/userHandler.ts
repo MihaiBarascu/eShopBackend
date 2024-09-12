@@ -27,7 +27,7 @@ const getByID = async (request: Request, response: Response) => {
 const create = async (request, response) => {
   try {
     const userRepository = AppDataSource.getRepository(User);
-    const user = request.body;
+    const user = plainToInstance(User, request.body);
 
     user.password = await hashPassword(user.password);
 
@@ -42,15 +42,25 @@ const update = async (request, response) => {
   try {
     const userRepository = AppDataSource.getRepository(User);
     const user = request.body;
+    console.log(request.body.id);
 
-    user.password = await hashPassword(user.password);
-
-    let userToUpdate = await userRepository.findOneBy({
-      id: Number(user.id),
+    const userToUpdate = await userRepository.findOneBy({
+      id: 2,
     });
 
-    userToUpdate = { ...user };
-    userRepository.update(Number(user.id), userToUpdate!);
+    console.log(userToUpdate);
+    if (!userToUpdate) {
+      return response.status(404).json({ message: "User not found" });
+    }
+
+    userToUpdate.firstName = user.firstName || userToUpdate.firstName;
+    userToUpdate.lastName = user.lastName || userToUpdate.lastName;
+    userToUpdate.email = user.email || userToUpdate.email;
+
+    if (user.password) {
+      userToUpdate.password = await hashPassword(user.password);
+    }
+    await userRepository.save(userToUpdate);
 
     response.status(201).json(user);
   } catch (error) {

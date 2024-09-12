@@ -7,12 +7,7 @@ import bcrypt from "bcrypt";
 import { hashPassword } from "./utils/hashPassword";
 import { CreateUserDto } from "./dto/user.dto";
 import usersRouter from "./controllers/users";
-
-dotenv.config();
-hashPassword("mihai").then((vall) => {
-  console.log(vall);
-});
-
+import { v4 } from "uuid";
 const app: Express = express();
 
 app.use(express.json());
@@ -20,6 +15,8 @@ app.use(express.json());
 const port = process.env.PORT || 3000;
 
 app.use("/users", usersRouter);
+
+console.log("uid", v4());
 
 // app.get("/users", async (req: Request, res: Response) => {
 //   try {
