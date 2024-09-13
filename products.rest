@@ -1,0 +1,101 @@
+DELETE http://localhost:3000/users/11
+Content-Type: application/json
+
+{ 
+  
+  "price": 12
+  
+}
+###############################
+PUT http://localhost:3000/products/2
+Content-Type: application/json
+
+{ 
+  "categories":[
+    {
+      "id": 2
+    }
+  ]
+}
+###############################
+POST http://localhost:3000/products/
+Content-Type: application/json
+
+{ 
+  "name": "Sony WH-1000XM4",
+  "description": "Noise-cancelling over-ear headphones",
+  "price": 349.99,
+  "stock": 200
+}
+###############################
+POST http://localhost:3000/products/
+Content-Type: application/json
+
+{ 
+  "name": "Dell XPS 13",
+  "description": "High-performance laptop with Intel i7 processor",
+  "price": 1199.99,
+  "stock": 30
+}
+###############################
+POST http://localhost:3000/products/
+Content-Type: application/json
+
+{ 
+  "name": "Apple MacBook Pro",
+  "description": "Apple laptop with M1 chip",
+  "price": 1299.99,
+  "stock": 20,
+  "category":[1,2,3]
+}
+###############################
+POST http://localhost:3000/products/
+Content-Type: application/json
+
+{ 
+  "name": "Google Pixel 6",
+  "description": "Google smartphone with Tensor chip",
+  "price": 599.99,
+  "stock": 80
+}
+###############################
+POST http://localhost:3000/products/
+Content-Type: application/json
+
+{ 
+  "name": "Amazon Echo Dot",
+  "description": "Smart speaker with Alexa",
+  "price": 49.99,
+  "stock": 300,
+  "categories":[1,2]
+}
+###############################
+POST http://localhost:3000/products/
+Content-Type: application/json
+
+{ 
+  "name": "Nintendo Switch",
+  "description": "Hybrid gaming console",
+  "price": 299.99,
+  "stock": 150
+}
+###############################
+POST http://localhost:3000/products/
+Content-Type: application/json
+
+{ 
+  "name": "Sony PlayStation 5",
+  "description": "Next-gen gaming console",
+  "price": 499.99,
+  "stock": 10
+}
+###############################
+PUT http://localhost:3000/products/
+Content-Type: application/json
+
+{ 
+  "name": "Microsoft Xbox Series X",
+  "description": "Next-gen gaming console",
+  "price": 499.99,
+  "stock": 15
+}

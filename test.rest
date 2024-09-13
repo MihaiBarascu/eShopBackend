@@ -1,15 +1,16 @@
-PUT http://localhost:3000/users/
+PUT http://localhost:3000/users/11
 Content-Type: application/json
 
 { 
-  "id":"4",
+  "lastName": "dana",
   
   "password":"asas"
 
 }
 #####################################
 
-DELETE http://localhost:3000/users/
+DELETE http://localhost:3000/users/10
+
 
 #####################################
 
@@ -20,7 +21,7 @@ Content-Type: application/json
   
   "lastName": "a12",
   "firstName": "a12",
-  "email": "a1@hotmail1.com",
+  "email": "aS21@yahoo.com",
   "password": "jane123"
 
 }

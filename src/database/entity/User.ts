@@ -13,7 +13,6 @@ import {
 import { Length, IsEmail, IsNotEmpty, IsAlpha } from "class-validator";
 import "reflect-metadata";
 import { v4 as uuidv4 } from "uuid";
-import { hash } from "bcrypt";
 
 @Entity()
 export class User {
@@ -35,14 +34,17 @@ export class User {
   @Column({ type: "text", nullable: false })
   password: string;
 
-  @BeforeInsert()
-  async hashPassword() {
-    this.password = await hash(this.password, 10);
-  }
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 
   @BeforeInsert()
   generateUuid() {
-    // Schimbă numele metodei pentru claritate
     this.uuid = uuidv4();
     console.log("Generated UUID: ", this.uuid);
   }

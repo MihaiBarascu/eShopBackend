@@ -1,0 +1,84 @@
+DELETE http://localhost:3000/categories/11
+Content-Type: application/json
+
+{ 
+  "name": "Electronics"
+}
+###############################
+
+
+
+
+
+
+POST http://localhost:3000/categories/
+Content-Type: application/json
+
+{ 
+  "name": "Smartphones",
+  "description": "Category for all kinds of smartphones",
+}
+###############################
+POST http://localhost:3000/categories/
+Content-Type: application/json
+
+{ 
+  "name": "Headphones",
+  "description": "Category for all kinds of headphones"
+}
+###############################
+POST http://localhost:3000/categories/
+Content-Type: application/json
+
+{ 
+  "name": "Laptops",
+  "description": "Category for all kinds of laptops"
+}
+###############################
+POST http://localhost:3000/categories/
+Content-Type: application/json
+
+{ 
+  "name": "Gaming Consoles",
+  "description": "Category for all kinds of gaming consoles"
+}
+###############################
+POST http://localhost:3000/categories/
+Content-Type: application/json
+
+{ 
+  "name": "Smart Home",
+  "description": "Category for smart home devices"
+}
+###############################
+POST http://localhost:3000/categories/
+Content-Type: application/json
+
+{ 
+  "name": "Wearables",
+  "description": "Category for wearable technology"
+}
+###############################
+POST http://localhost:3000/categories/
+Content-Type: application/json
+
+{ 
+  "name": "Tablets",
+  "description": "Category for all kinds of tablets"
+}
+###############################
+POST http://localhost:3000/categories/
+Content-Type: application/json
+
+{ 
+  "name": "Cameras",
+  "description": "Category for all kinds of cameras"
+}
+###############################
+PUT http://localhost:3000/categories/1
+Content-Type: application/json
+
+{ 
+  "name": "Updated Category Name",
+  "description": "Updated description for the category"
+}

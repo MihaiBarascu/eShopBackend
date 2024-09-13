@@ -1,25 +1,26 @@
 import { Router } from "express";
 
 import { validateBodyMiddleware } from "../middlewares/validationMiddleware";
-import { CreateUserDto, UpdateUserDto } from "../dto/user.dto";
+import { CreateProductDto, UpdateProductDto } from "../dto/product.dto";
 import userHandler from "../handlers/userHandler";
-import { User } from "../database/entity/User";
-const usersRouter = Router();
+import Product from "../database/entity/Product";
+import productHandler from "../handlers/productHandler";
+const productsRouter = Router();
 // router.get("/:userId", handler.getUser);
 // router.get("/", handler.listUsers);
 // router.get("/:userId", handler.getUser);
-usersRouter.get("/", userHandler.get);
-usersRouter.get("/:id", userHandler.getByID);
-usersRouter.post(
+productsRouter.get("/", productHandler.get);
+productsRouter.get("/:id", productHandler.getByID);
+productsRouter.post(
   "/",
-  validateBodyMiddleware(CreateUserDto),
-  userHandler.create
+  validateBodyMiddleware(CreateProductDto),
+  productHandler.createProduct
 );
-usersRouter.delete("/:id", userHandler.deleteById);
-usersRouter.put(
+productsRouter.delete("/:id", productHandler.deleteById);
+productsRouter.put(
   "/:id",
-  validateBodyMiddleware(UpdateUserDto),
-  userHandler.update
+  validateBodyMiddleware(UpdateProductDto),
+  productHandler.update
 );
 
 // router.delete("/:userId", handler.deleteUser);
@@ -27,4 +28,5 @@ usersRouter.put(
 // router.delete("/:userId/roles/:roleId", handler.removeRole);
 // router.get("/:userId/orders", handler.listOrders);
 // router.get("/:userId/orders/:orderId", handler.getOrder);
-export default usersRouter;
+export default productsRouter;
+

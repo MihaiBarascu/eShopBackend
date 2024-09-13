@@ -7,33 +7,31 @@ import { User } from "../database/entity/User";
 import { hashPassword } from "../utils/hashPassword";
 
 const get = shared.get(User);
+const deleteById = shared.deleteById(User);
 
-const getByID = async (request: Request, response: Response) => {
+const getByID = shared.getByID(User);
+
+const create = async (request: Request, response: Response) => {
   try {
-    const user = await AppDataSource.getRepository(User).findOneBy({
-      id: Number(request.params.userId),
-    });
+    const repository = AppDataSource.getRepository(User);
+    const body = request.body;
 
-    if (user) {
-      response.json(user);
-    } else {
-      response.status(404).json({ message: "User not found" });
-    }
+    const entity = plainToInstance(User, body);
+    body.password = await hashPassword(body.password);
+
+    await repository.save(entity);
+    response.status(201).json(entity);
   } catch (error) {
-    response.status(500).json({ message: "Error getting user", error });
+    response.status(500).json({ error });
   }
 };
-
-const create = shared.create(User);
-
-const update = async (request, response) => {
+const update = async (request: Request, response: Response) => {
   try {
     const userRepository = AppDataSource.getRepository(User);
     const user = request.body;
-    console.log(request.body.id);
 
     const userToUpdate = await userRepository.findOneBy({
-      id: request.body.id,
+      id: Number(request.params.id),
     });
 
     console.log(userToUpdate);
@@ -56,4 +54,4 @@ const update = async (request, response) => {
   }
 };
 
-export default { create, get, getByID, update };
+export default { create, get, getByID, update, deleteById };
