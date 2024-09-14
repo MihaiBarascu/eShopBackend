@@ -35,13 +35,12 @@ export class CreateProductDto {
   @IsOptional()
   stock: number;
 
-  @IsArray({ message: "categories must be an array" })
-  @ArrayNotEmpty({ message: "categories must not be empty" })
-  @ArrayMinSize(1, { message: "categories must contain at least one category" })
+  @IsArray()
   @IsOptional()
-  @ValidateNested({ each: true })
+  @ArrayNotEmpty()
   @Type(() => Number)
-  category: number[];
+  @IsNumber({}, { each: true, message: "each category must be a number" })
+  categories: number[];
 }
 
 export class UpdateProductDto {
@@ -65,5 +64,12 @@ export class UpdateProductDto {
   @IsNumber({}, { message: "stock must be a number" })
   @Min(0, { message: "stock must be a positive number" })
   stock: number;
+
+  @IsArray()
+  @IsOptional()
+  @ArrayNotEmpty()
+  @Type(() => Number)
+  @IsNumber({}, { each: true, message: "each category must be a number" })
+  categories: number[];
 }
 

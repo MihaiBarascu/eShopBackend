@@ -12,6 +12,7 @@ import {
 } from "typeorm";
 import { v4 } from "uuid";
 import Category from "./Category";
+import OrderProducts from "./OrderProducts";
 
 @Entity()
 export default class Product {
@@ -21,13 +22,16 @@ export default class Product {
   @Column("uuid")
   uuid: string;
 
+  @Column()
+  stock: number;
+
   @Column({ length: 100, nullable: false })
   name: string;
 
   @Column({ nullable: false, default: 0 })
   price: number;
 
-  @Column({ length: 255, nullable: false })
+  @Column({ type: "text", nullable: false })
   description: string;
 
   @CreateDateColumn()
@@ -39,17 +43,20 @@ export default class Product {
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @BeforeInsert()
-  addUuid() {
-    this.uuid = v4();
-  }
-
   @ManyToMany(() => Category, (category) => category.products)
   @JoinTable({
     name: "product_categories",
     joinColumn: { name: "product_id", referencedColumnName: "id" },
     inverseJoinColumn: { name: "category_id", referencedColumnName: "id" },
   })
-  category: Category[];
+  categories: Category[];
+
+  @OneToMany(() => OrderProducts, (orderProduct) => orderProduct.product)
+  orderProducts: OrderProducts[];
+
+  @BeforeInsert()
+  addUuid() {
+    this.uuid = v4();
+  }
 }
 

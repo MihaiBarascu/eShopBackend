@@ -12,6 +12,7 @@ import {
 } from "typeorm";
 import { Length, IsEmail, IsNotEmpty, IsAlpha } from "class-validator";
 import "reflect-metadata";
+import Order from "./Order";
 import { v4 as uuidv4 } from "uuid";
 
 @Entity()
@@ -42,6 +43,10 @@ export class User {
 
   @DeleteDateColumn()
   deletedAt: Date;
+
+
+  @OneToMany(() => Order, (order) => order.user)
+  orders: Order[];
 
   @BeforeInsert()
   generateUuid() {

@@ -1,0 +1,30 @@
+### Test GET all OrderProducts
+GET http://localhost:3000/order-products
+Accept: application/json
+
+###
+
+### Test GET OrderProducts by ID
+GET http://localhost:3000/order-products/1
+Accept: application/json
+
+###
+
+### Test POST create OrderProducts
+POST http://localhost:3000/order-products
+Content-Type: application/json
+
+{
+  "orderId": 3,
+  "productId": 10,
+  "quantity": 10,
+  "isReady": true,
+  "status": "Pending",
+  "description": "Test order product"
+}
+
+###
+
+### Test DELETE OrderProducts by ID
+DELETE http://localhost:3000/order-products/1
+Accept: application/json

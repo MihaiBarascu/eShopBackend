@@ -1,0 +1,40 @@
+### Get all orders
+GET http://localhost:3000/orders
+Content-Type: application/json
+
+###
+
+### Get a specific order by ID
+GET http://localhost:3000/orders/1
+Content-Type: application/json
+
+###
+
+### Create a new order
+POST http://localhost:3000/orders
+Content-Type: application/json
+
+{
+  "userId": 15,
+  "description": "New Order",
+  "type": "Type A",
+  "status": "Pending"
+}
+
+###
+
+### Update an existing order
+PUT http://localhost:3000/orders/2
+Content-Type: application/json
+
+{
+  "description": "Updated Order",
+  "type": "Type B",
+  "status": "Completed"
+}
+
+###
+
+### Delete an order
+DELETE http://localhost:3000/orders/4
+Content-Type: application/json

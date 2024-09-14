@@ -17,7 +17,7 @@ const create = async (request: Request, response: Response) => {
     const body = request.body;
 
     const entity = plainToInstance(User, body);
-    body.password = await hashPassword(body.password);
+    entity.password = await hashPassword(body.password);
 
     await repository.save(entity);
     response.status(201).json(entity);

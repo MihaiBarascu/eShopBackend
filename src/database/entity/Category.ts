@@ -34,7 +34,7 @@ export default class Category {
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @ManyToMany(() => Product, (product) => product.category)
+  @ManyToMany(() => Product, (product) => product.categories)
   products: Product[];
 
   @BeforeInsert()
