@@ -28,7 +28,7 @@ export default class Order {
   description: string;
 
   @Column({ length: 100, nullable: false })
-  "type": string;
+  type: string;
 
   @Column({ length: 100, nullable: false })
   status: string;
@@ -53,4 +53,3 @@ export default class Order {
     this.uuid = v4();
   }
 }
-

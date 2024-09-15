@@ -14,15 +14,16 @@ DELETE http://localhost:3000/users/10
 
 #####################################
 
-POST http://localhost:3000/users/
+PUT http://localhost:3000/users/12
 Content-Type: application/json
 
 { 
   
   "lastName": "Barascu",
   "firstName": "Mihai",
-  "email": "mihaialex_barascu@yahoo.com",
-  "password": "mihailol"
+  "email": "mihaialex_barascu2@yahoo.com",
+  "password": "mihailol",
+  "roles": [2]
 
 }
 #####################################test request with token
@@ -33,5 +34,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1paGFpY
 
 ###############TEST WITH PUBLIC HEADER
 
-GET http://localhost:3000/users/
+get http://localhost:3000/users/
 public: true
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1paGFpYWxleF9iYXJhc2N1QHlhaG9vLmNvbSIsImlhdCI6MTcyNjM5OTc2MiwiZXhwIjoxNzI2NDAzMzYyfQ.rS8DsceJ_qW3yYxEHhA15bqg_58HFeJwb6EgqZRKjCQ

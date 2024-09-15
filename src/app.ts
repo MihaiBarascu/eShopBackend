@@ -7,6 +7,8 @@ import categoriesRouter from "./controllers/categories";
 import ordersRouter from "./controllers/orders";
 import orderProductsRouter from "./controllers/orderProducts";
 import authRouter from "./controllers/auth";
+import rolesRouter from "./controllers/roles";
+import permissionsRouter from "./controllers/permissions";
 const app: Express = express();
 
 app.use(express.json());
@@ -16,6 +18,8 @@ app.use("/products", productsRouter);
 app.use("/categories", categoriesRouter);
 app.use("/orders", ordersRouter);
 app.use("/order-products", orderProductsRouter);
+app.use("/roles", rolesRouter);
+app.use("/permissions", permissionsRouter);
 app.use("/auth", authRouter);
 
 const unknownEndpoint = (request, response) => {

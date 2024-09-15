@@ -14,6 +14,7 @@ import { Length, IsEmail, IsNotEmpty, IsAlpha } from "class-validator";
 import "reflect-metadata";
 import Order from "./Order";
 import { v4 as uuidv4 } from "uuid";
+import { Role } from "./Role";
 
 @Entity()
 export class User {
@@ -44,6 +45,13 @@ export class User {
   @DeleteDateColumn()
   deletedAt: Date;
 
+  @ManyToMany(() => Role, (role: Role) => role.users)
+  @JoinTable({
+    name: "user_roles",
+    joinColumn: { name: "user_id", referencedColumnName: "id" },
+    inverseJoinColumn: { name: "role_id", referencedColumnName: "id" },
+  })
+  roles: Role[];
 
   @OneToMany(() => Order, (order) => order.user)
   orders: Order[];
@@ -51,6 +59,5 @@ export class User {
   @BeforeInsert()
   generateUuid() {
     this.uuid = uuidv4();
-    console.log("Generated UUID: ", this.uuid);
   }
 }

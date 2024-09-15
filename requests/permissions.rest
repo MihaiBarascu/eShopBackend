@@ -1,0 +1,26 @@
+### Create a new permission
+PUT http://localhost:3000/permissions/1
+Content-Type: application/json
+
+{
+  "name": "READ",
+  "description": "Permission to read data"
+}
+
+### Create another permission
+PUT http://localhost:3000/permissions/2
+Content-Type: application/json
+
+{
+  "name": "WRITE",
+  "description": "Permission to write data"
+}
+
+### Create another permission
+PUT http://localhost:3000/permissions/3
+Content-Type: application/json
+
+{
+  "name": "DELETE",
+  "description": "Permission to delete data"
+}

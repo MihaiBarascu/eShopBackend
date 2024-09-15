@@ -1,27 +1,26 @@
 import { Router } from "express";
 
 import { validateBodyMiddleware } from "../middlewares/validationMiddleware";
-import { CreateUserDto, UpdateUserDto } from "../dto/user.dto";
+import { CreateRoleDto, UpdateRoleDto } from "../dto/role.dto";
 import userHandler from "../handlers/userHandler";
-import { User } from "../database/entity/User";
-import Auth from "../middlewares/Auth";
-
-const usersRouter = Router();
+import Product from "../database/entity/Product";
+import roleHandler from "../handlers/roleHandler";
+const rolesRouter = Router();
 // router.get("/:userId", handler.getUser);
 // router.get("/", handler.listUsers);
 // router.get("/:userId", handler.getUser);
-usersRouter.get("/", Auth, userHandler.get);
-usersRouter.get("/:id", userHandler.getByID);
-usersRouter.post(
+rolesRouter.get("/", roleHandler.get);
+rolesRouter.get("/:id", roleHandler.getByID);
+rolesRouter.post(
   "/",
-  validateBodyMiddleware(CreateUserDto),
-  userHandler.createUser
+  validateBodyMiddleware(CreateRoleDto),
+  roleHandler.createRole
 );
-usersRouter.delete("/:id", userHandler.deleteById);
-usersRouter.put(
+rolesRouter.delete("/:id", roleHandler.deleteById);
+rolesRouter.put(
   "/:id",
-  validateBodyMiddleware(UpdateUserDto),
-  userHandler.updateUser
+  validateBodyMiddleware(UpdateRoleDto),
+  roleHandler.updateRole
 );
 
 // router.delete("/:userId", handler.deleteUser);
@@ -29,4 +28,5 @@ usersRouter.put(
 // router.delete("/:userId/roles/:roleId", handler.removeRole);
 // router.get("/:userId/orders", handler.listOrders);
 // router.get("/:userId/orders/:orderId", handler.getOrder);
-export default usersRouter;
+export default rolesRouter;
+
