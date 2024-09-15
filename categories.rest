@@ -82,3 +82,4 @@ Content-Type: application/json
   "name": "Updated Category Name",
   "description": "Updated description for the category"
 }
+

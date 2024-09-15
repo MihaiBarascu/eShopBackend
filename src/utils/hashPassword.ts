@@ -1,7 +1,9 @@
-import bcrypt from "bcrypt";
+import { hash } from "bcrypt";
 
-const salt = process.env.HASH_SALT!;
+const saltRoundsEnv = Number(process.env.SALT_ROUNDS);
+const saltRounds =
+  isNaN(saltRoundsEnv) || saltRoundsEnv <= 0 ? 10 : saltRoundsEnv;
 
 export async function hashPassword(myPlaintextPassword: string) {
-  return bcrypt.hash(myPlaintextPassword, salt);
+  return hash(myPlaintextPassword, saltRounds);
 }

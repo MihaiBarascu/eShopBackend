@@ -5,6 +5,7 @@ import { CreateOrderDto, UpdateOrderDto } from "../dto/order.dto";
 import userHandler from "../handlers/userHandler";
 import Product from "../database/entity/Product";
 import orderHandler from "../handlers/orderHandler";
+
 const ordersRouter = Router();
 // router.get("/:userId", handler.getUser);
 // router.get("/", handler.listUsers);
@@ -29,4 +30,3 @@ ordersRouter.put(
 // router.get("/:userId/orders", handler.listOrders);
 // router.get("/:userId/orders/:orderId", handler.getOrder);
 export default ordersRouter;
-

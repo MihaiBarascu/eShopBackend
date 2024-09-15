@@ -4,11 +4,13 @@ import { validateBodyMiddleware } from "../middlewares/validationMiddleware";
 import { CreateUserDto, UpdateUserDto } from "../dto/user.dto";
 import userHandler from "../handlers/userHandler";
 import { User } from "../database/entity/User";
+import Auth from "../middlewares/Auth";
+
 const usersRouter = Router();
 // router.get("/:userId", handler.getUser);
 // router.get("/", handler.listUsers);
 // router.get("/:userId", handler.getUser);
-usersRouter.get("/", userHandler.get);
+usersRouter.get("/", Auth, userHandler.get);
 usersRouter.get("/:id", userHandler.getByID);
 usersRouter.post(
   "/",

@@ -14,7 +14,7 @@ export interface CustomRequest extends Request {
 
 const authenticateJWT = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
-  const SECRET_KEY: Secret = process.env.NODE_JWT_SECRET ?? "";
+  const SECRET_KEY: Secret = process.env.JWT_SECRET ?? "";
   if (SECRET_KEY === "") {
     throw new Error("Secret key not found");
   }

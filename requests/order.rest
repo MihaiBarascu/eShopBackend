@@ -15,7 +15,7 @@ POST http://localhost:3000/orders
 Content-Type: application/json
 
 {
-  "userId": 15,
+  "userId": 10,
   "description": "New Order",
   "type": "Type A",
   "status": "Pending"

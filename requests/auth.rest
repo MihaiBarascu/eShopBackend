@@ -1,0 +1,12 @@
+POST http://localhost:3000/auth
+Content-Type: application/json
+
+{
+  "email":"mihaialex_barascu@yahoo.com",
+  "password":"mihailol"
+
+}
+
+
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1paGFpYWxleF9iYXJhc2N1QHlhaG9vLmNvbSIsImlhdCI6MTcyNjM5OTc2MiwiZXhwIjoxNzI2NDAzMzYyfQ.rS8DsceJ_qW3yYxEHhA15bqg_58HFeJwb6EgqZRKjCQ"
+}

@@ -18,14 +18,15 @@ Content-Type: application/json
   ]
 }
 ###############################
-POST http://localhost:3000/products/
+PUT http://localhost:3000/products/1
 Content-Type: application/json
 
 { 
   "name": "Sony WH-1000XM4",
   "description": "Noise-cancelling over-ear headphones",
   "price": 349.99,
-  "stock": 200
+  "stock": 200,
+  "categories":[1]
 }
 ###############################
 PUT http://localhost:3000/products/10

@@ -30,7 +30,9 @@ services:
       DB_USERNAME: eShop
       DB_PASSWORD: eShop
       DB_DATANASE: eSHOP
-      HASH_SALT: $HASH_SALT
+      SALT_ROUNDS: $SALT_ROUNDS
+      JWT_SECRET: $JWT_SECRET
+      JWT_EXPIRES_IN: $JWT_EXPIRES_IN
     depends_on:
       - mysql
     command: npm run dev

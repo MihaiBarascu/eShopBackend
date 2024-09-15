@@ -19,10 +19,19 @@ Content-Type: application/json
 
 { 
   
-  "lastName": "ionesc",
-  "firstName": "alex",
-  "email": "ion@yahoo.com",
-  "password": "jane123"
+  "lastName": "Barascu",
+  "firstName": "Mihai",
+  "email": "mihaialex_barascu@yahoo.com",
+  "password": "mihailol"
 
 }
-#####################################
+#####################################test request with token
+
+GET http://localhost:3000/users/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1paGFpYWxleF9iYXJhc2N1QHlhaG9vLmNvbSIsImlhdCI6MTcyNjM5OTc2MiwiZXhwIjoxNzI2NDAzMzYyfQ.rS8DsceJ_qW3yYxEHhA15bqg_58HFeJwb6EgqZRKjCQ
+
+
+###############TEST WITH PUBLIC HEADER
+
+GET http://localhost:3000/users/
+public: true
