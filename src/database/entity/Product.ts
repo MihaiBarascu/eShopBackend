@@ -13,6 +13,7 @@ import {
 import { v4 } from "uuid";
 import Category from "./Category";
 import OrderProducts from "./OrderProducts";
+import Image from "./ProductImage";
 
 @Entity()
 export default class Product {
@@ -53,6 +54,9 @@ export default class Product {
 
   @OneToMany(() => OrderProducts, (orderProduct) => orderProduct.product)
   orderProducts: OrderProducts[];
+
+  @OneToMany(() => Image, (image) => image.product)
+  images: Image[];
 
   @BeforeInsert()
   addUuid() {

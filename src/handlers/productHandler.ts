@@ -76,7 +76,44 @@ const updateProduct = async (request: Request, response: Response) => {
   }
 };
 
+const getProducts = async (
+  request: Request,
+  response: Response,
+  next: NextFunction
+) => {
+  try {
+    const repository = AppDataSource.getRepository(Product);
+    const builder = repository.createQueryBuilder("product");
+    if (request.query.s) {
+      builder.where(`name LIKE :s`, { s: `%${request.query.s}%` });
+    }
+
+    const sort: any = request.query.sort;
+
+    if (sort) {
+      builder.orderBy(`price`, sort.toUpperCase());
+    }
+
+    const page: number = parseInt(request.query.page as any) || 1;
+    const perPage: number = parseInt(request.query.perPage as any) || 9;
+    const total = await builder.getCount();
+
+    builder.offset((page - 1) * perPage).limit(perPage);
+
+    response.json({
+      data: await builder.getMany(),
+      total,
+      page,
+      perPage,
+      totalPages: Math.ceil(total / perPage),
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default {
+  getProducts,
   createProduct,
   create,
   get,

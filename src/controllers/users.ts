@@ -17,6 +17,7 @@ usersRouter.post(
   validateBodyMiddleware(CreateUserDto),
   userHandler.createUser
 );
+
 usersRouter.delete("/:id", userHandler.deleteById);
 usersRouter.put(
   "/:id",

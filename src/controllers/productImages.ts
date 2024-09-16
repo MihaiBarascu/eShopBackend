@@ -1,38 +1,29 @@
 import { Router } from "express";
 
 import { validateBodyMiddleware } from "../middlewares/validationMiddleware";
-import { CreateProductDto, UpdateProductDto } from "../dto/product.dto";
 import userHandler from "../handlers/userHandler";
-import Product from "../database/entity/Product";
-import productHandler from "../handlers/productHandler";
+import ProductImage from "../database/entity/ProductImage";
 import productImagesHandler from "../handlers/productImagesHandler";
 import upload from "../middlewares/fileUpload";
 import { validatePictureUpload } from "../middlewares/validatePictureUpload";
 
-const productsRouter = Router();
+const productImagesRouter = Router();
 // router.get("/:userId", handler.getUser);
 // router.get("/", handler.listUsers);
 // router.get("/:userId", handler.getUser);
-productsRouter.get("/", productHandler.getProducts);
-productsRouter.get("/:id", productHandler.getByID);
-productsRouter.post(
+productImagesRouter.get("/", productImagesHandler.get);
+productImagesRouter.get("/:id", productImagesHandler.getByID);
+productImagesRouter.post(
   "/",
-  validateBodyMiddleware(CreateProductDto),
-  productHandler.createProduct
-);
-productsRouter.post(
-  "/:id/image",
   validatePictureUpload,
   upload.single("image"),
-  productImagesHandler.createProductImage,
-  upload.single("image")
+  productImagesHandler.createProductImage
 );
-
-productsRouter.delete("/:id", productHandler.deleteById);
-productsRouter.put(
+productImagesRouter.delete("/:id", productImagesHandler.deleteById);
+productImagesRouter.put(
   "/:id",
-  validateBodyMiddleware(UpdateProductDto),
-  productHandler.updateProduct
+
+  productImagesHandler.update
 );
 
 // router.delete("/:userId", handler.deleteUser);
@@ -40,5 +31,5 @@ productsRouter.put(
 // router.delete("/:userId/roles/:roleId", handler.removeRole);
 // router.get("/:userId/orders", handler.listOrders);
 // router.get("/:userId/orders/:orderId", handler.getOrder);
-export default productsRouter;
+export default productImagesRouter;
 

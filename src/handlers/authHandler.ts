@@ -36,3 +36,8 @@ const create = async (
 
 export default create;
 
+//imagini, 1 produs mai multe img, tabel pivot  , one to many,  ruta adaugare imagini in controller produs produs/prudctid/image
+
+//stochez iamgini, , nu mai amri de 5 mega
+
+//PAGINARE PRODUSE
