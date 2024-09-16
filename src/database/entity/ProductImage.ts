@@ -44,6 +44,9 @@ export default class Image {
   @DeleteDateColumn()
   deletedAt: Date;
 
+  @Column({ type: "int", nullable: false })
+  productId: number;
+
   @ManyToOne(() => Product, (product) => product.images)
   @JoinColumn({ name: "productId" })
   product: Product;
@@ -53,4 +56,3 @@ export default class Image {
     this.uuid = v4();
   }
 }
-

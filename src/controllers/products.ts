@@ -22,10 +22,8 @@ productsRouter.post(
 );
 productsRouter.post(
   "/:id/image",
-  validatePictureUpload,
-  upload.single("image"),
-  productImagesHandler.createProductImage,
-  upload.single("image")
+  upload.array("images", 5),
+  productImagesHandler.createProductImage
 );
 
 productsRouter.delete("/:id", productHandler.deleteById);
@@ -41,4 +39,3 @@ productsRouter.put(
 // router.get("/:userId/orders", handler.listOrders);
 // router.get("/:userId/orders/:orderId", handler.getOrder);
 export default productsRouter;
-

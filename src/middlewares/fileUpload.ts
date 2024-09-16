@@ -7,7 +7,7 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 },
   storage: multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(null, path.join(__dirname, "../../uploads"));
+      cb(null, path.join(__dirname, "../../uploads/temp"));
     },
     filename: (req, file, cb) => {
       cb(null, `${Date.now()}-${file.originalname}`);
@@ -24,4 +24,3 @@ const upload = multer({
 });
 
 export default upload;
-

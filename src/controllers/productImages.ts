@@ -14,9 +14,8 @@ const productImagesRouter = Router();
 productImagesRouter.get("/", productImagesHandler.get);
 productImagesRouter.get("/:id", productImagesHandler.getByID);
 productImagesRouter.post(
-  "/",
-  validatePictureUpload,
-  upload.single("image"),
+  "/:id",
+  upload.array("pictures", 5),
   productImagesHandler.createProductImage
 );
 productImagesRouter.delete("/:id", productImagesHandler.deleteById);
@@ -32,4 +31,3 @@ productImagesRouter.put(
 // router.get("/:userId/orders", handler.listOrders);
 // router.get("/:userId/orders/:orderId", handler.getOrder);
 export default productImagesRouter;
-
