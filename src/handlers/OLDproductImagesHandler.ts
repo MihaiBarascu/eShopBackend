@@ -1,11 +1,10 @@
-import { Request, Response, NextFunction, response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { AppDataSource } from "../database/data-source";
 import shared from "./shared";
 import Product from "../database/entity/Product";
 import ProductImage from "../database/entity/ProductImage";
 import fs from "fs";
 import path from "path";
-import uploadPicture from "../utils/uploadPicture";
 
 const get = shared.get(ProductImage);
 const deleteById = shared.deleteById(ProductImage);
@@ -33,19 +32,35 @@ const createProductImage = async (
         .json({ message: `Product with id ${productId} not found` });
     }
 
-    const productImageDetails = new ProductImage();
-    productImageDetails.description = req.body.description;
-    productImageDetails.product = product;
+    const picturesToUpload = req.files as Express.Multer.File[] | undefined;
 
-    const details = await uploadPicture(req, `products/${productId}`);
+    if (!picturesToUpload || picturesToUpload.length === 0) {
+      return res.status(400).json({ message: `Picture to upload not found` });
+    }
 
-    productImageDetails.name = details.name;
-    productImageDetails.size = details.fileSize;
-    productImageDetails.type = details.type;
+    const productImages: ProductImage[] = [];
 
-    const result = await productImageRepository.save(productImageDetails);
+    for (const picture of picturesToUpload) {
+      const uploadDir = path.join(
+        __dirname,
+        `../../uploads/products/${product.id}`
+      );
+      const picturePath = path.join(uploadDir, picture.filename);
 
-    res.status(200).json(result);
+      await fs.promises.mkdir(uploadDir, { recursive: true });
+
+      await fs.promises.rename(picture.path, picturePath);
+
+      const productImage = new ProductImage();
+      productImage.name = picture.filename;
+      productImage.size = picture.size;
+      productImage.type = picture.mimetype;
+      productImage.product = product;
+      productImages.push(productImage);
+    }
+
+    const savedProductImages = await productImageRepository.save(productImages);
+    return res.status(201).json({ savedProductImages });
   } catch (error) {
     next(error);
   }

@@ -3,7 +3,7 @@ import { Router } from "express";
 import { validateBodyMiddleware } from "../middlewares/validationMiddleware";
 import userHandler from "../handlers/userHandler";
 import ProductImage from "../database/entity/ProductImage";
-import productImagesHandler from "../handlers/productImagesHandler2";
+import productImagesHandler from "../handlers/productImagesHandler";
 import upload from "../middlewares/fileUpload";
 import { validatePictureUpload } from "../middlewares/validatePictureUpload";
 

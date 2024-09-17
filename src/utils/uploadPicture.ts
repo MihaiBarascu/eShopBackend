@@ -6,31 +6,41 @@ import { IncomingHttpHeaders } from "http";
 import { MAX_FILE_SIZE } from "./config";
 import { info as logInfo, error as logError } from "./logger";
 
-export default function uploadPicture(
+interface PictureDetails {
+  fileSize: number;
+  type: string;
+  name: string;
+}
+
+export default async function uploadPicture(
   req: Request,
-  productId: number
-): Promise<boolean> {
-  return new Promise(async (resolve, reject) => {
-    const headers = req.headers as IncomingHttpHeaders;
+  directory: string
+): Promise<PictureDetails> {
+  const headers = req.headers as IncomingHttpHeaders;
 
-    const bb = busboy({ headers });
-    let fileSize = 0;
-    let isError = false;
+  const pictureDetails: PictureDetails = {
+    fileSize: 0,
+    type: "",
+    name: "",
+  };
 
-    const uploadDir = path.join(
-      __dirname,
-      `../../uploads/products/${productId}`
-    );
+  const bb = busboy({ headers });
 
-    try {
-      await fs.promises.mkdir(uploadDir, { recursive: true });
-    } catch (err) {
-      logError("Failed to create upload directory", err);
-      return reject(false);
-    }
+  let isError = false;
 
+  const uploadDir = path.join(__dirname, `../../uploads/${directory}`);
+
+  try {
+    await fs.promises.mkdir(uploadDir, { recursive: true });
+  } catch (err) {
+    logError("Failed to create directory", err);
+    throw new Error(`Failed to create directory: ${uploadDir}`);
+  }
+
+  return new Promise((resolve, reject) => {
     bb.on("file", (name, file, info) => {
       const { filename, encoding, mimeType } = info;
+
       logInfo(
         `File [${name}] : filename : %j, encoding: %j, mimeType: %j`,
         filename,
@@ -38,26 +48,45 @@ export default function uploadPicture(
         mimeType
       );
 
-      const saveTo = path.join(uploadDir, `${Date.now()}-${filename}`);
+      const allowedMimeTypes = ["image/jpeg", "image/png", "image/gif"];
+      if (!allowedMimeTypes.includes(mimeType)) {
+        logError(`File [${name}] has an invalid mime type: ${mimeType}`);
+        isError = true;
+        file.destroy();
+        return reject(new Error(`Invalid file type: ${mimeType}`));
+      }
+
+      pictureDetails.type = mimeType;
+      pictureDetails.name = `${Date.now()}-${filename}`;
+      const saveTo = path.join(uploadDir, pictureDetails.name);
       const writeStream = fs.createWriteStream(saveTo);
 
       writeStream.on("error", (err) => {
         logError(`Error writing file [${name}]`, err);
         isError = true;
         file.destroy();
+        fs.promises.unlink(saveTo).catch((unlinkErr) => {
+          logError(`Failed to remove incomplete file [${name}]`, unlinkErr);
+        });
         reject(err);
       });
 
       file.on("data", (data) => {
-        fileSize += data.length;
+        pictureDetails.fileSize += data.length;
         logInfo(`File [${name}] got ${data.length} bytes`);
 
-        if (fileSize > MAX_FILE_SIZE) {
-          logError(`File [${name}] exceeds the maximum size of 5MB`);
+        if (pictureDetails.fileSize > MAX_FILE_SIZE) {
+          logError(
+            `File [${name}] exceeds the maximum size of ${MAX_FILE_SIZE} bytes`
+          );
           isError = true;
           file.destroy();
           writeStream.destroy();
-          reject(new Error(`File [${name}] exceeds the maximum size of 5MB`));
+          reject(
+            new Error(
+              `File [${name}] exceeds the maximum size of ${MAX_FILE_SIZE} bytes`
+            )
+          );
         }
       });
 
@@ -88,11 +117,10 @@ export default function uploadPicture(
         reject(new Error("File upload failed"));
       } else {
         logInfo("Finished parsing form");
-        resolve(true);
+        resolve(pictureDetails);
       }
     });
 
     req.pipe(bb);
   });
 }
-

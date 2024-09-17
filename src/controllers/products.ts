@@ -21,11 +21,7 @@ productsRouter.post(
   validateBodyMiddleware(CreateProductDto),
   productHandler.createProduct
 );
-productsRouter.post(
-  "/:id/image",
-  upload.array("images", 5),
-  productImagesHandler.createProductImage
-);
+productsRouter.post("/:id/image", productImagesHandler.create);
 
 productsRouter.delete("/:id", productHandler.deleteById);
 productsRouter.put(
