@@ -85,7 +85,7 @@ export default function uploadPicture(
     bb.on("close", () => {
       if (isError) {
         logError("File upload failed");
-        resolve(false);
+        reject(new Error("File upload failed"));
       } else {
         logInfo("Finished parsing form");
         resolve(true);
