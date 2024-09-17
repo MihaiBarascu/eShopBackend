@@ -13,10 +13,7 @@ const create = async (
 
     const userRepository = AppDataSource.getRepository(User);
 
-    const user = await userRepository.findOne({
-      where: { email },
-      relations: ["roles", "roles.permissions"],
-    });
+    const user = await userRepository.findOneBy({ email });
 
     if (!user) {
       return response.status(404).send("Invalid email");
@@ -27,16 +24,6 @@ const create = async (
     if (!isPasswordValid) {
       return response.status(401).send("Invalid password");
     }
-
-    const roles = user?.roles.map((role) => role.name);
-
-    const permissions = user?.roles.flatMap((role) => role.permissions);
-
-    if (!roles || !permissions) {
-      return response.status(200).send("login successful");
-    }
-
-    console.log(roles, permissions);
 
     const token = generateJWT(user.email);
 
@@ -54,4 +41,3 @@ export default create;
 //stochez iamgini, , nu mai amri de 5 mega
 
 //PAGINARE PRODUSE
-

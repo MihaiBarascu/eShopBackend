@@ -41,7 +41,10 @@ const createProductImage = async (
     const productImages: ProductImage[] = [];
 
     for (const picture of picturesToUpload) {
-      const uploadDir = path.join(__dirname, `../../uploads/${product.id}`);
+      const uploadDir = path.join(
+        __dirname,
+        `../../uploads/products/${product.id}`
+      );
       const picturePath = path.join(uploadDir, picture.filename);
 
       await fs.promises.mkdir(uploadDir, { recursive: true });

@@ -8,12 +8,13 @@ import productHandler from "../handlers/productHandler";
 import productImagesHandler from "../handlers/productImagesHandler";
 import upload from "../middlewares/fileUpload";
 import { validatePictureUpload } from "../middlewares/validatePictureUpload";
+import { pagination } from "../middlewares/pagination";
 
 const productsRouter = Router();
 // router.get("/:userId", handler.getUser);
 // router.get("/", handler.listUsers);
 // router.get("/:userId", handler.getUser);
-productsRouter.get("/", productHandler.getProducts);
+productsRouter.get("/", productHandler.get);
 productsRouter.get("/:id", productHandler.getByID);
 productsRouter.post(
   "/",

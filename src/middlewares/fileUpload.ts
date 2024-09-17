@@ -6,9 +6,6 @@ import { AppDataSource } from "../database/data-source";
 const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 },
   storage: multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, path.join(__dirname, "../../uploads/temp"));
-    },
     filename: (req, file, cb) => {
       cb(null, `${Date.now()}-${file.originalname}`);
     },
@@ -24,3 +21,4 @@ const upload = multer({
 });
 
 export default upload;
+// utilitar care sa salveze fisiere ii dau fisierele de ep request

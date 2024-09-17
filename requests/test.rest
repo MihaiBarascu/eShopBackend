@@ -21,9 +21,9 @@ Content-Type: application/json
   
   "lastName": "Barascu",
   "firstName": "Mihai",
-  "email": "mihaialex_barascu2@yahoo.com",
+  "email": "mihaialex_barascu@yahoo.com",
   "password": "mihailol",
-  "roles": [2]
+  "roles": [1]
 
 }
 #####################################test request with token

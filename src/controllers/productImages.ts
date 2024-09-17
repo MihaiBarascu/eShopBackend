@@ -3,7 +3,7 @@ import { Router } from "express";
 import { validateBodyMiddleware } from "../middlewares/validationMiddleware";
 import userHandler from "../handlers/userHandler";
 import ProductImage from "../database/entity/ProductImage";
-import productImagesHandler from "../handlers/productImagesHandler";
+import productImagesHandler from "../handlers/productImagesHandler2";
 import upload from "../middlewares/fileUpload";
 import { validatePictureUpload } from "../middlewares/validatePictureUpload";
 
@@ -13,11 +13,7 @@ const productImagesRouter = Router();
 // router.get("/:userId", handler.getUser);
 productImagesRouter.get("/", productImagesHandler.get);
 productImagesRouter.get("/:id", productImagesHandler.getByID);
-productImagesRouter.post(
-  "/:id",
-  upload.array("pictures", 5),
-  productImagesHandler.createProductImage
-);
+productImagesRouter.post("/:id", productImagesHandler.createProductImage);
 productImagesRouter.delete("/:id", productImagesHandler.deleteById);
 productImagesRouter.put(
   "/:id",

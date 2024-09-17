@@ -25,4 +25,3 @@ authRouter.post("/", validateBodyMiddleware(LoginDto), authHandler);
 // router.get("/:userId/orders", handler.listOrders);
 // router.get("/:userId/orders/:orderId", handler.getOrder);
 export default authRouter;
-

@@ -10,10 +10,12 @@ import authRouter from "./controllers/auth";
 import rolesRouter from "./controllers/roles";
 import permissionsRouter from "./controllers/permissions";
 import productImagesRouter from "./controllers/productImages";
+import { pagination } from "./middlewares/pagination";
 const app: Express = express();
 
 app.use(express.json());
 
+app.use(pagination);
 app.use("/users", usersRouter);
 app.use("/products", productsRouter);
 app.use("/categories", categoriesRouter);

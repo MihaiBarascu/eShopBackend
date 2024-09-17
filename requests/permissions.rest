@@ -1,5 +1,5 @@
 ### Create a new permission
-PUT http://localhost:3000/permissions/1
+POST http://localhost:3000/permissions
 Content-Type: application/json
 
 {
@@ -8,7 +8,7 @@ Content-Type: application/json
 }
 
 ### Create another permission
-PUT http://localhost:3000/permissions/2
+POST http://localhost:3000/permissions/
 Content-Type: application/json
 
 {
@@ -17,7 +17,7 @@ Content-Type: application/json
 }
 
 ### Create another permission
-PUT http://localhost:3000/permissions/3
+POST http://localhost:3000/permissions/
 Content-Type: application/json
 
 {

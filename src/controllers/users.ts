@@ -10,7 +10,7 @@ const usersRouter = Router();
 // router.get("/:userId", handler.getUser);
 // router.get("/", handler.listUsers);
 // router.get("/:userId", handler.getUser);
-usersRouter.get("/", Auth, userHandler.get);
+usersRouter.get("/", userHandler.get);
 usersRouter.get("/:id", userHandler.getByID);
 usersRouter.post(
   "/",

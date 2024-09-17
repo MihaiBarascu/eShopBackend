@@ -8,6 +8,13 @@ interface EntityWithID {
   id: number;
 }
 
+interface CustomRequest extends Request {
+  pagination?: {
+    page: number;
+    limit: number;
+  };
+}
+
 function create<T extends object>(type: new () => T) {
   return async (request: Request, response: Response) => {
     try {
@@ -25,10 +32,14 @@ function create<T extends object>(type: new () => T) {
 }
 
 function get<T extends object>(type: new () => T) {
-  return async (request: Request, response: Response) => {
+  return async (request: CustomRequest, response: Response) => {
     try {
-      const users = await AppDataSource.getRepository(type).find();
-      response.json(users);
+      const page: number | undefined = request.pagination?.page;
+      const limit: number | undefined = request.pagination?.limit;
+      const values = await AppDataSource.getRepository(type).find(
+        page && limit ? { skip: (page - 1) * limit, take: limit } : {}
+      );
+      response.json(values);
     } catch (error) {
       response.status(500).json({ message: "Error getting users", error });
     }
