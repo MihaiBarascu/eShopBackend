@@ -34,12 +34,22 @@ function create<T extends object>(type: new () => T) {
 function get<T extends object>(type: new () => T) {
   return async (request: CustomRequest, response: Response) => {
     try {
+      const repository = AppDataSource.getRepository(type);
+
       const page: number | undefined = request.pagination?.page;
       const limit: number | undefined = request.pagination?.limit;
-      const values = await AppDataSource.getRepository(type).find(
+      const values = await repository.find(
         page && limit ? { skip: (page - 1) * limit, take: limit } : {}
       );
-      response.json(values);
+      const total = await repository.count();
+
+      response.json({
+        data: values,
+        total: total,
+        page: page ?? undefined,
+        perPage: limit ?? undefined,
+        totalPages: limit ? Math.ceil(total / limit) : undefined,
+      });
     } catch (error) {
       response.status(500).json({ message: "Error getting users", error });
     }

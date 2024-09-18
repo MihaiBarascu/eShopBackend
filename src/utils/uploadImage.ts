@@ -4,7 +4,7 @@ import busboy from "busboy";
 import { Request } from "express";
 import { IncomingHttpHeaders } from "http";
 import { MAX_FILE_SIZE } from "./config";
-import { info as logInfo, error as logError } from "./logger";
+import { info as logInfo, error as logError, warn as logWarn } from "./logger";
 
 interface PictureDetails {
   fileSize: number;
@@ -27,6 +27,7 @@ export default async function uploadPicture(
   const bb = busboy({ headers });
 
   let isError = false;
+  let fileProcessed = false;
 
   const uploadDir = path.join(__dirname, `../../uploads/${directory}`);
 
@@ -39,6 +40,13 @@ export default async function uploadPicture(
 
   return new Promise((resolve, reject) => {
     bb.on("file", (name, file, info) => {
+      if (fileProcessed) {
+        logWarn(`Multiple files are not allowed. ${info.filename} rejected`);
+        file.resume();
+        return;
+      }
+      fileProcessed = true;
+
       const { filename, encoding, mimeType } = info;
 
       logInfo(

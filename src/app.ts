@@ -9,8 +9,8 @@ import orderProductsRouter from "./controllers/orderProducts";
 import authRouter from "./controllers/auth";
 import rolesRouter from "./controllers/roles";
 import permissionsRouter from "./controllers/permissions";
-import productImagesRouter from "./controllers/productImages";
-import { pagination } from "./middlewares/pagination";
+import productImagesRouter from "./controllers/UNUSED-productImages";
+import { pagination } from "./middlewares/paginationMiddleware";
 const app: Express = express();
 
 app.use(express.json());

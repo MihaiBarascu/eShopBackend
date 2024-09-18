@@ -55,7 +55,7 @@ export default class Product {
   @OneToMany(() => OrderProducts, (orderProduct) => orderProduct.product)
   orderProducts: OrderProducts[];
 
-  @OneToMany(() => Image, (image) => image.product)
+  @OneToMany(() => Image, (image) => image.product, { cascade: true })
   images: Image[];
 
   @BeforeInsert()

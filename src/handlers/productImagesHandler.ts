@@ -5,7 +5,7 @@ import Product from "../database/entity/Product";
 import ProductImage from "../database/entity/ProductImage";
 import fs from "fs";
 import path from "path";
-import uploadPicture from "../utils/uploadPicture";
+import uploadPicture from "../utils/uploadImage";
 
 const get = shared.get(ProductImage);
 const deleteById = shared.deleteById(ProductImage);
@@ -52,3 +52,5 @@ const createProductImage = async (
 };
 
 export default { createProductImage, create, get, getByID, update, deleteById };
+
+//trimit id produs

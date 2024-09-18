@@ -5,6 +5,8 @@ import { AppDataSource } from "../database/data-source";
 import shared from "./shared";
 import Product from "../database/entity/Product";
 import Category from "../database/entity/Category";
+import ProductImage from "../database/entity/ProductImage";
+import uploadPicture from "../utils/uploadImage";
 
 const get = shared.get(Product);
 const deleteById = shared.deleteById(Product);
@@ -112,6 +114,38 @@ const getProducts = async (
   }
 };
 
+const addImage = async (request, response, next) => {
+  try {
+    const productRepository = AppDataSource.getRepository(Product);
+    const id = request.params.id;
+    const product = await productRepository.findOne({
+      where: { id: Number(request.params.id) },
+      relations: ["images"],
+    });
+    if (!product) {
+      return response
+        .status(404)
+        .json({ message: `Product with id ${id} not found` });
+    }
+
+    const productImageDetails = new ProductImage();
+
+    const details = await uploadPicture(request, `products/${id}`);
+
+    productImageDetails.name = details.name;
+    productImageDetails.size = details.fileSize;
+    productImageDetails.type = details.type;
+
+    product.images.push(productImageDetails);
+
+    const result = await productRepository.save(product);
+
+    response.status(200).json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
 export default {
   getProducts,
   createProduct,
@@ -121,5 +155,6 @@ export default {
   update,
   deleteById,
   updateProduct,
+  addImage,
 };
 

@@ -28,9 +28,12 @@ const create = async (
       return response.status(401).send("Invalid password");
     }
 
-    const roles = user?.roles.map((role) => role.name);
+    let roles = user?.roles.map((role) => role.name);
 
-    const permissions = user?.roles.flatMap((role) => role.permissions);
+    let permissions = user?.roles.flatMap((role) => role.permissions);
+
+    roles = [...new Set(roles)];
+    permissions = [...new Set(permissions)];
 
     if (!roles || !permissions) {
       return response.status(200).send("login successful");
@@ -38,7 +41,11 @@ const create = async (
 
     console.log(roles, permissions);
 
-    const token = generateJWT(user.email);
+    const token = generateJWT({
+      email: user.email,
+      roles: roles,
+      permissions: permissions,
+    });
 
     return response.status(200).send({ token });
   } catch (error) {

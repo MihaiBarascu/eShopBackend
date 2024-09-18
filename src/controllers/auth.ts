@@ -4,7 +4,7 @@ import { validateBodyMiddleware } from "../middlewares/validationMiddleware";
 import { LoginDto } from "../dto/login.dto";
 import userHandler from "../handlers/userHandler";
 import Product from "../database/entity/Product";
-import authHandler from "../handlers/authHandler";
+import authHandler from "../handlers/loginHandler";
 const authRouter = Router();
 // router.get("/:userId", handler.getUser);
 // router.get("/", handler.listUsers);
