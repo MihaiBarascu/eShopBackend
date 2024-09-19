@@ -1,16 +1,20 @@
 import { Request, Response, NextFunction } from "express";
-import { AppDataSource } from "../database/data-source"; // Asigură-te că importul este corect
+import { AppDataSource } from "../database/data-source";
 import { User } from "../database/entity/User";
 import { checkPassword } from "../utils/checkPassword";
-import { generateJWT } from "../utils/generateJWT";
-import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from "../utils/config";
 
+import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from "../utils/config";
+import jwt from "jsonwebtoken";
 const login = async (
   request: Request,
   response: Response,
   next: NextFunction
 ) => {
   try {
+    if (!ACCESS_TOKEN_SECRET || !REFRESH_TOKEN_SECRET) {
+      throw new Error("Token secrets are not defined");
+    }
+
     const { email, password } = request.body;
 
     const userRepository = AppDataSource.getRepository(User);
@@ -30,37 +34,43 @@ const login = async (
       return response.status(401).send("Invalid password");
     }
 
-    let rolesNames = user?.roles.map((role) => role.name);
+    let roleIds: number[] = user?.roles.map((role) => role.id);
     let permissions = user?.roles.flatMap((role) => role.permissions);
 
-    let permissionNames = permissions.map((permission) => permission.name);
+    let permissionIds: number[] = permissions.map(
+      (permission) => permission.id
+    );
 
-    rolesNames = [...new Set(rolesNames)];
-    permissionNames = [...new Set(permissionNames)];
+    const uniqueRoleIds = [...new Set(roleIds)];
+    const uniquePermissionIds = [...new Set(permissionIds)];
 
-    console.log(rolesNames, permissionNames);
+    const accessToken = jwt.sign(
+      {
+        UserInfo: {
+          email: user.email,
+          roles: uniqueRoleIds,
+          permissions: uniquePermissionIds,
+        },
+      },
+      ACCESS_TOKEN_SECRET!,
+      { expiresIn: "10m" }
+    );
 
-    const accessToken = generateJWT(ACCESS_TOKEN_SECRET, "10m", {
-      email: user.email,
-      roles: rolesNames,
-      permissions: permissionNames,
-    });
-
-    const refreshToken = generateJWT(REFRESH_TOKEN_SECRET, "10m", {
-      email: user.email,
-      roles: rolesNames,
-      permissions: permissionNames,
-    });
+    const refreshToken = jwt.sign(
+      {
+        email: user.email,
+      },
+      REFRESH_TOKEN_SECRET!,
+      { expiresIn: "5h" }
+    );
 
     user.refreshToken = refreshToken;
-
-    const savedUser = await userRepository.save(user);
 
     response.cookie("jwt", refreshToken, {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
       sameSite: "none",
-      secure:true
+      secure: true,
     });
     response.status(200).json({ accessToken });
   } catch (error) {

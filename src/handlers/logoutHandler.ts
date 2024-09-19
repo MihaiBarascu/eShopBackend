@@ -2,7 +2,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 import { AppDataSource } from "../database/data-source"; // Asigură-te că importul este corect
 import { User } from "../database/entity/User";
-import { generateJWT } from "../utils/generateJWT";
+
 import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from "../utils/config";
 
 const logout = async (

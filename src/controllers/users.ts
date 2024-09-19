@@ -4,10 +4,18 @@ import { validateBodyMiddleware } from "../middlewares/validationMiddleware";
 import { CreateUserDto, UpdateUserDto } from "../dto/user.dto";
 import userHandler from "../handlers/userHandler";
 import verifyJWT from "../middlewares/verifyAccessTokenMiddleware";
+import { verifyRoles } from "../middlewares/verifyRolesMiddleware";
+import { ROLES_LIST } from "../utils/config";
 
 const usersRouter = Router();
 
-usersRouter.route("/").get(verifyJWT, userHandler.get);
+usersRouter.use(verifyJWT);
+
+usersRouter.get(
+  "/",
+  verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor),
+  userHandler.get
+);
 
 // router.get("/:userId", handler.getUser);
 // router.get("/", handler.listUsers);
