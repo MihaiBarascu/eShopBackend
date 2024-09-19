@@ -1,5 +1,6 @@
 import * as dotenv from "dotenv";
 import { DataSource } from "typeorm";
+import { info, error } from "../utils/logger";
 
 dotenv.config();
 
@@ -19,8 +20,8 @@ export const AppDataSource = new DataSource({
 
 AppDataSource.initialize()
   .then(() => {
-    console.log("Data Source has been initialized!");
+    info("Data Source has been initialized!");
   })
   .catch((error) => {
-    console.error("Error during Data Source initialization:", error);
+    error("Error during Data Source initialization:", error);
   });

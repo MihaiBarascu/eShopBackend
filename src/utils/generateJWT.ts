@@ -1,12 +1,16 @@
 import jwt from "jsonwebtoken";
 
-export function generateJWT(userInfo: object) {
-  if (!process.env.JWT_SECRET || !process.env.JWT_EXPIRES_IN) {
-    throw new Error("JWT_SECRET or JWT_EXPIRES_IN envs not found");
+export function generateJWT(
+  secret: string | undefined,
+  expiration: string | undefined,
+  userInfo: object | undefined
+) {
+  if (!expiration || !secret || !userInfo) {
+    throw new Error("Params are missing");
   }
 
-  return jwt.sign({ userInfo }, process.env.JWT_SECRET as string, {
-    expiresIn: process.env.JWT_EXPIRES_IN,
+  return jwt.sign({ userInfo }, secret, {
+    expiresIn: expiration,
   });
 }
 

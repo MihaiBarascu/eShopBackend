@@ -14,7 +14,8 @@ export const DB_MIGRATIONS =
 export const DB_CLI_MIGRATIONS_DIR =
   process.env.DB_CLI_MIGRATIONS_DIR || "src/migration";
 export const SALT_ROUNDS = process.env.SALT_ROUNDS || 10;
-export const JWT_SECRET = process.env.JWT_SECRET || "s3cretP3ntru7jwt!";
-export const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "1h";
 export const MAX_FILE_SIZE =
   Number(process.env.MAX_FILE_SIZE) || 5 * 1024 * 1024;
+
+export const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
+export const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;

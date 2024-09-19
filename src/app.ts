@@ -11,11 +11,23 @@ import rolesRouter from "./controllers/roles";
 import permissionsRouter from "./controllers/permissions";
 import productImagesRouter from "./controllers/UNUSED-productImages";
 import { pagination } from "./middlewares/paginationMiddleware";
+import cookieParser from "cookie-parser";
+import refreshTokenRouter from "./controllers/refresh";
+import logoutRouter from "./controllers/logout";
+import morgan from "morgan";
+
 const app: Express = express();
 
 app.use(express.json());
 
+app.use(cookieParser());
+
+app.use(morgan("dev"));
+
 app.use(pagination);
+app.use("/auth", authRouter);
+app.use("/refresh", refreshTokenRouter);
+app.use("/logout", logoutRouter);
 app.use("/users", usersRouter);
 app.use("/products", productsRouter);
 app.use("/categories", categoriesRouter);
@@ -24,7 +36,6 @@ app.use("/order-products", orderProductsRouter);
 app.use("/roles", rolesRouter);
 app.use("/permissions", permissionsRouter);
 app.use("/product-images", productImagesRouter);
-app.use("/auth", authRouter);
 
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: "unknown endpoint" });

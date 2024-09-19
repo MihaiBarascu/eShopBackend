@@ -1,17 +1,17 @@
 import { Router } from "express";
 
 import { validateBodyMiddleware } from "../middlewares/validationMiddleware";
-import { LoginDto } from "../dto/login.dto";
+import { AuthDto } from "../dto/auth.dto";
 import userHandler from "../handlers/userHandler";
 import Product from "../database/entity/Product";
-import authHandler from "../handlers/loginHandler";
+import authHandler from "../handlers/authHandler";
 const authRouter = Router();
 // router.get("/:userId", handler.getUser);
 // router.get("/", handler.listUsers);
 // router.get("/:userId", handler.getUser);
 // categoriesRouter.get("/", categoryHandler.get);
 // categoriesRouter.get("/:id", categoryHandler.getByID);
-authRouter.post("/", validateBodyMiddleware(LoginDto), authHandler);
+authRouter.post("/", validateBodyMiddleware(AuthDto), authHandler);
 // categoriesRouter.delete("/:id", categoryHandler.deleteById);
 // categoriesRouter.put(
 //   "/:id",

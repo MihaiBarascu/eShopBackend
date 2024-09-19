@@ -45,6 +45,9 @@ export class User {
   @DeleteDateColumn()
   deletedAt: Date;
 
+  @Column({ type: "text", nullable: true })
+  refreshToken: string;
+
   @ManyToMany(() => Role, (role: Role) => role.users)
   @JoinTable({
     name: "user_roles",

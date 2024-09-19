@@ -124,7 +124,7 @@ export default async function uploadPicture(
         logError("File upload failed");
         reject(new Error("File upload failed"));
       } else {
-        logInfo("Finished parsing form");
+        //logInfo("Finished parsing form");
         resolve(pictureDetails);
       }
     });
