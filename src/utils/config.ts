@@ -18,4 +18,12 @@ export const MAX_FILE_SIZE =
   Number(process.env.MAX_FILE_SIZE) || 5 * 1024 * 1024;
 
 export const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
+if (!ACCESS_TOKEN_SECRET) throw new Error("undefined access token secret");
 export const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
+if (!REFRESH_TOKEN_SECRET) throw new Error("undefined refresh token secret");
+
+export const ROLES_LIST = {
+  Admin: 10,
+  User: 3,
+  Editor: 4,
+};
