@@ -7,6 +7,8 @@ import { User } from "../database/entity/User";
 import { hashPassword } from "../utils/hashPassword";
 import { Role } from "../database/entity/Role";
 import { In } from "typeorm";
+import { extendedRequest } from "../utils/types";
+import Order from "../database/entity/Order";
 
 const get = shared.get(User);
 const deleteById = shared.deleteById(User);
@@ -93,4 +95,31 @@ const updateUser = async (
   }
 };
 
-export default { createUser, get, getByID, updateUser, deleteById };
+export const listOrders = async (
+  req: extendedRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = Number(req.params.userId);
+
+    const orderRepository = AppDataSource.getRepository(Order);
+
+    const orders = await orderRepository.find({
+      where: { userId: userId },
+      relations: ["orderProducts", "orderProducts.product"],
+    });
+
+    if (orders.length === 0) {
+      return res
+        .status(404)
+        .json({ message: `No ordres for user(${req.params.userId})` });
+    }
+
+    res.status(200).json(orders);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export default { createUser, get, getByID, updateUser, deleteById, listOrders };

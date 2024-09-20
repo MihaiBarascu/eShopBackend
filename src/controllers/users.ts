@@ -26,7 +26,11 @@ usersRouter.post(
 
 usersRouter.delete("/:id", userHandler.deleteById);
 
-usersRouter.get("/:userId/orders", verifyUserIdParamMiddleware, listOrders);
+usersRouter.get(
+  "/:userId/orders",
+  verifyUserIdParamMiddleware,
+  userHandler.listOrders
+);
 
 // router.delete("/:userId", handler.deleteUser);
 // router.post("/:userId/roles/:roleId", handler.addRole);
