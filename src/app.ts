@@ -9,7 +9,6 @@ import orderProductsRouter from "./controllers/orderProducts";
 import authRouter from "./controllers/auth";
 import rolesRouter from "./controllers/roles";
 import permissionsRouter from "./controllers/permissions";
-import productImagesRouter from "./controllers/UNUSED-productImages";
 import { pagination } from "./middlewares/paginationMiddleware";
 import cookieParser from "cookie-parser";
 import refreshTokenRouter from "./controllers/refresh";
@@ -35,7 +34,6 @@ app.use("/orders", ordersRouter);
 app.use("/order-products", orderProductsRouter);
 app.use("/roles", rolesRouter);
 app.use("/permissions", permissionsRouter);
-app.use("/product-images", productImagesRouter);
 
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: "unknown endpoint" });

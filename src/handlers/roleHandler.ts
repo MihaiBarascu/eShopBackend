@@ -20,16 +20,17 @@ const createRole = async (req: Request, res: Response, next: NextFunction) => {
 
     const role = req.body;
 
-    const permissions = await permissionRepository.findBy({
-      id: In(role.permissions),
-    });
+    if (role.permissions) {
+      const permissions = await permissionRepository.findBy({
+        id: In(role.permissions),
+      });
 
-    if (permissions.length !== req.body.permissions.length) {
-      return res.status(400).send("Invalid permissions");
+      if (permissions.length !== req.body.permissions.length) {
+        return res.status(400).send("Invalid permissions");
+      }
+
+      role.permissions = permissions;
     }
-
-    role.permissions = permissions;
-
     const result = await roleRepository.save(plainToInstance(Role, role));
 
     return res.status(201).json(result);

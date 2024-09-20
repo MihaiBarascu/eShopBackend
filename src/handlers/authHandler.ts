@@ -50,6 +50,7 @@ const login = async (
           email: user.email,
           roles: uniqueRoleIds,
           permissions: uniquePermissionIds,
+          id: Number(user.id),
         },
       },
       ACCESS_TOKEN_SECRET!,
@@ -65,6 +66,7 @@ const login = async (
     );
 
     user.refreshToken = refreshToken;
+    await userRepository.save(user);
 
     response.cookie("jwt", refreshToken, {
       httpOnly: true,
@@ -74,8 +76,7 @@ const login = async (
     });
     response.status(200).json({ accessToken });
   } catch (error) {
-    console.error(error);
-    return response.status(500).send("Internal server error");
+    next(error);
   }
 };
 

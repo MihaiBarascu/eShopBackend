@@ -1,10 +1,10 @@
-PUT http://localhost:3000/users/11
+PUT http://localhost:3000/users/1
 Content-Type: application/json
 
 { 
-  "lastName": "dana",
   
-  "password":"asas"
+  
+  "password":"mihailol"
 
 }
 #####################################
@@ -26,6 +26,15 @@ Content-Type: application/json
   "roles": [1]
 
 }
+###########################################
+PUT http://localhost:3000/users/10
+Content-Type: application/json
+
+{
+"password":"mihailol"
+}
+
+
 #####################################test request with token
 
 GET http://localhost:3000/users/

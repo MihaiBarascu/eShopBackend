@@ -6,21 +6,16 @@ import userHandler from "../handlers/userHandler";
 import verifyJWT from "../middlewares/verifyAccessTokenMiddleware";
 import { verifyRoles } from "../middlewares/verifyRolesMiddleware";
 import { ROLES_LIST } from "../utils/config";
+import { listOrders } from "../handlers/userOrdersHandler";
 
 const usersRouter = Router();
-
-usersRouter.use(verifyJWT);
-
-usersRouter.get(
-  "/",
-  verifyRoles(ROLES_LIST.Admin, ROLES_LIST.Editor),
-  userHandler.get
+usersRouter.put(
+  "/:id",
+  validateBodyMiddleware(UpdateUserDto),
+  userHandler.updateUser
 );
-
-// router.get("/:userId", handler.getUser);
-// router.get("/", handler.listUsers);
-// router.get("/:userId", handler.getUser);
-// usersRouter.get("/", userHandler.get);
+usersRouter.use(verifyJWT);
+usersRouter.get("/", verifyRoles(ROLES_LIST.Admin), userHandler.get);
 usersRouter.get("/:id", userHandler.getByID);
 usersRouter.post(
   "/",
@@ -29,11 +24,8 @@ usersRouter.post(
 );
 
 usersRouter.delete("/:id", userHandler.deleteById);
-usersRouter.put(
-  "/:id",
-  validateBodyMiddleware(UpdateUserDto),
-  userHandler.updateUser
-);
+
+usersRouter.get("/:userId/orders", listOrders);
 
 // router.delete("/:userId", handler.deleteUser);
 // router.post("/:userId/roles/:roleId", handler.addRole);

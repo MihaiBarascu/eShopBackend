@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { AppDataSource } from "../database/data-source";
-import shared from "./shared";
+import shared from "../handlers/shared";
 import Product from "../database/entity/Product";
 import ProductImage from "../database/entity/ProductImage";
 import fs from "fs";

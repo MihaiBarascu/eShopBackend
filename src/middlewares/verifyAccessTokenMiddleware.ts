@@ -1,9 +1,8 @@
-import jwt, { JwtPayload, Secret } from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 import { ACCESS_TOKEN_SECRET } from "../utils/config";
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
 import { extendedRequest } from "../utils/types";
-
 
 export default function verifyJWT(
   request: extendedRequest,
@@ -21,8 +20,8 @@ export default function verifyJWT(
     request.email = (decoded as JwtPayload).UserInfo.email;
     request.roles = (decoded as JwtPayload).UserInfo.roles;
     request.permissions = (decoded as JwtPayload).UserInfo.permissions;
-
-    console.log(request.email, request.roles, request.permissions);
+    request.id = (decoded as JwtPayload).UserInfo.id;
+    console.log(request.email, request.roles, request.permissions, request.id);
     next();
   });
 }

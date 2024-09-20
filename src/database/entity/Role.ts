@@ -24,7 +24,7 @@ export class Role {
   @Column({ length: 100, nullable: false })
   name: string;
 
-  @Column({ length: 100, nullable: false })
+  @Column({ length: 100, nullable: true })
   description: string;
 
   @CreateDateColumn()

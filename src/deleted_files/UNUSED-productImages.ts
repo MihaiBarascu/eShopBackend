@@ -4,8 +4,8 @@ import { validateBodyMiddleware } from "../middlewares/validationMiddleware";
 import userHandler from "../handlers/userHandler";
 import ProductImage from "../database/entity/ProductImage";
 import productImagesHandler from "../handlers/productImagesHandler";
-import upload from "../middlewares/UNUSED-fileUpload";
-import { validatePictureUpload } from "../middlewares/UNUSED-validatePictureUpload";
+import upload from "./UNUSED-fileUpload";
+import { validatePictureUpload } from "./UNUSED-validatePictureUpload";
 
 const productImagesRouter = Router();
 // router.get("/:userId", handler.getUser);

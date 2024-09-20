@@ -16,6 +16,7 @@ const refreshToken = async (
     }
 
     const cookies = request.cookies;
+
     if (!cookies?.jwt) return response.sendStatus(401);
 
     const refreshToken = cookies.jwt;
@@ -26,6 +27,7 @@ const refreshToken = async (
       where: { refreshToken: refreshToken },
       relations: ["roles", "roles.permissions"],
     });
+
     if (!foundUser) return response.sendStatus(403);
     let roleIds: number[] = foundUser?.roles.map((role) => role.id);
     let permissions = foundUser?.roles.flatMap((role) => role.permissions);
@@ -48,6 +50,7 @@ const refreshToken = async (
             email: decoded.email,
             roles: uniqueRoleIds,
             permissions: uniquePermissionIds,
+            id: Number(foundUser.id),
           },
         },
         ACCESS_TOKEN_SECRET!,

@@ -23,7 +23,7 @@ export const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 if (!REFRESH_TOKEN_SECRET) throw new Error("undefined refresh token secret");
 
 export const ROLES_LIST = {
-  Admin: 10,
+  Admin: 2,
   User: 3,
   Editor: 4,
 };
