@@ -13,10 +13,6 @@ export const listOrders = async (
   try {
     const userId = Number(req.params.userId);
 
-    if (!req.roles?.includes(ROLES_LIST.Admin) && req.id !== userId) {
-      return res.status(403).json({ message: "You are not authorized" });
-    }
-
     const orderRepository = AppDataSource.getRepository(Order);
 
     const orders = await orderRepository.find({
