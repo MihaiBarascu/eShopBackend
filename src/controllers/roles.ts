@@ -2,8 +2,6 @@ import { Router } from "express";
 
 import { validateBodyMiddleware } from "../middlewares/validationMiddleware";
 import { CreateRoleDto, UpdateRoleDto } from "../dto/role.dto";
-import userHandler from "../handlers/userHandler";
-import Product from "../database/entity/Product";
 import roleHandler from "../handlers/roleHandler";
 const rolesRouter = Router();
 // router.get("/:userId", handler.getUser);
@@ -29,4 +27,3 @@ rolesRouter.put(
 // router.get("/:userId/orders", handler.listOrders);
 // router.get("/:userId/orders/:orderId", handler.getOrder);
 export default rolesRouter;
-

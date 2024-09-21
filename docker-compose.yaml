@@ -31,8 +31,6 @@ services:
       DB_PASSWORD: eShop
       DB_DATANASE: eSHOP
       SALT_ROUNDS: $SALT_ROUNDS
-      JWT_SECRET: $JWT_SECRET
-      JWT_EXPIRES_IN: $JWT_EXPIRES_IN
     depends_on:
       - mysql
     command: npm run dev

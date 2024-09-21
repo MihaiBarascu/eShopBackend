@@ -6,30 +6,30 @@ import userHandler from "../handlers/userHandler";
 import verifyJWT from "../middlewares/verifyAccessTokenMiddleware";
 import { verifyRoles } from "../middlewares/verifyRolesMiddleware";
 import { ROLES_LIST } from "../utils/config";
-import { listOrders } from "../handlers/userOrdersHandler";
 import { verifyUserIdParamMiddleware } from "../middlewares/verifyUserIdParamMiddleware";
 
 const usersRouter = Router();
+usersRouter.use(verifyJWT);
+
+usersRouter.param("userId", verifyUserIdParamMiddleware);
+
+usersRouter.get("/:userId", userHandler.getUserByID);
+usersRouter.delete("/:userId", userHandler.deleteUserById);
+usersRouter.get("/:userId/orders", userHandler.listOrders);
+usersRouter.post("/:userId/orders", userHandler.createOrderByUserId);
+
+usersRouter.use(verifyRoles(ROLES_LIST.Admin));
 usersRouter.put(
   "/:id",
   validateBodyMiddleware(UpdateUserDto),
   userHandler.updateUser
 );
-usersRouter.use(verifyJWT);
-usersRouter.get("/", verifyRoles(ROLES_LIST.Admin), userHandler.get);
-usersRouter.get("/:id", userHandler.getByID);
+
+usersRouter.get("/", userHandler.get);
 usersRouter.post(
   "/",
   validateBodyMiddleware(CreateUserDto),
   userHandler.createUser
-);
-
-usersRouter.delete("/:id", userHandler.deleteById);
-
-usersRouter.get(
-  "/:userId/orders",
-  verifyUserIdParamMiddleware,
-  userHandler.listOrders
 );
 
 // router.delete("/:userId", handler.deleteUser);

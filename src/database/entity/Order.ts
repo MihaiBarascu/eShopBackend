@@ -24,13 +24,13 @@ export default class Order {
   @Column({ nullable: false })
   userId: number;
 
-  @Column({ length: 100, nullable: false })
+  @Column({ length: 100, nullable: true })
   description: string;
 
-  @Column({ length: 100, nullable: false })
+  @Column({ length: 100, nullable: true })
   type: string;
 
-  @Column({ length: 100, nullable: false })
+  @Column({ length: 100, nullable: true })
   status: string;
 
   @CreateDateColumn()
@@ -42,7 +42,9 @@ export default class Order {
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @OneToMany(() => OrderProducts, (orderProducts) => orderProducts.order)
+  @OneToMany(() => OrderProducts, (orderProducts) => orderProducts.order, {
+    cascade: true,
+  })
   orderProducts: OrderProducts[];
 
   @ManyToOne(() => User, (user) => user.orders)

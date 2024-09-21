@@ -14,6 +14,7 @@ import cookieParser from "cookie-parser";
 import refreshTokenRouter from "./controllers/refresh";
 import logoutRouter from "./controllers/logout";
 import morgan from "morgan";
+import registerRouter from "./controllers/register";
 
 const app: Express = express();
 
@@ -24,6 +25,8 @@ app.use(cookieParser());
 app.use(morgan("dev"));
 
 app.use(pagination);
+
+app.use("/register", registerRouter);
 app.use("/auth", authRouter);
 app.use("/refresh", refreshTokenRouter);
 app.use("/logout", logoutRouter);

@@ -32,3 +32,8 @@ export const listOrders = async (
   }
 };
 
+export const createOrder = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {};

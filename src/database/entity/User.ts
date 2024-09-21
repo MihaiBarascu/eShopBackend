@@ -56,7 +56,7 @@ export class User {
   })
   roles: Role[];
 
-  @OneToMany(() => Order, (order) => order.user)
+  @OneToMany(() => Order, (order) => order.user, { cascade: true })
   orders: Order[];
 
   @BeforeInsert()

@@ -9,7 +9,7 @@ export const verifyUserIdParamMiddleware = (
 ) => {
   try {
     const userId = Number(req.params.userId);
-
+    console.log("---------------", userId);
     if (!req.roles?.includes(ROLES_LIST.Admin) && req.id !== userId) {
       return res.status(403).json({ message: "You are not authorized" });
     }
@@ -19,4 +19,3 @@ export const verifyUserIdParamMiddleware = (
     next(err);
   }
 };
-
