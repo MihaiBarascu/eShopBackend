@@ -9,6 +9,9 @@ import { extendedRequest } from "../utils/types";
 import Order from "../database/entity/Order";
 import OrderProducts from "../database/entity/OrderProducts";
 import Product from "../database/entity/Product";
+
+import { transactionContext } from "../database/transactionContext";
+
 const get = shared.get(User);
 const deleteById = shared.deleteById(User);
 
@@ -18,62 +21,75 @@ const createOrderByUserId = async (
   next: NextFunction
 ) => {
   try {
-    const userRepository = AppDataSource.getRepository(User);
-    const productRepository = AppDataSource.getRepository(Product);
+    await transactionContext(async (transactionMangaer) => {
+      const userRepository = transactionMangaer.getRepository(User);
+      const productRepository = transactionMangaer.getRepository(Product);
 
-    const { orderProducts } = req.body;
-    const userId = Number(req.params.userId);
+      let { orderProducts } = req.body;
 
-    const foundUser = await userRepository.findOne({
-      where: { id: userId },
-      relations: ["orders", "orders.orderProducts"],
-    });
+      orderProducts = Object.values(
+        orderProducts.reduce((acc, curr) => {
+          if (acc[curr.productId]) {
+            acc[curr.productId].quantity += curr.quantity;
+          } else {
+            acc[curr.productId] = { ...curr };
+          }
+          return acc;
+        }, {} as Record<number, (typeof orderProducts)[0]>)
+      );
 
-    if (!foundUser) {
-      return res.status(404).json({ message: `User(${userId}) not found` });
-    }
+      const userId = Number(req.params.userId);
 
-    if (!orderProducts || !orderProducts.length) {
-      return res.status(400).json({ message: `No products added to order` });
-    }
-
-    const newOrder = new Order();
-    newOrder.orderProducts = [] as OrderProducts[];
-
-    for (const orderProduct of orderProducts) {
-      const foundProduct = await productRepository.findOneBy({
-        id: orderProduct.productId,
+      const foundUser = await userRepository.findOne({
+        where: { id: userId },
+        relations: ["orders", "orders.orderProducts"],
       });
 
-      if (!foundProduct) {
-        return res
-          .status(404)
-          .json({ message: `Product (${orderProduct.productId}) not found` });
+      if (!foundUser) {
+        return res.status(404).json({ message: `User(${userId}) not found` });
       }
 
-      if (foundProduct.stock < orderProduct.quantity) {
-        return res
-          .status(404)
-          .json({
-            message: `Not enough stock for product (${orderProduct.productId})`,
-          });
+      if (!orderProducts || !orderProducts.length) {
+        return res.status(400).json({ message: `No products added to order` });
       }
 
-      foundProduct.stock -= orderProduct.quantity;
+      const newOrder = new Order();
+      newOrder.orderProducts = [] as OrderProducts[];
+      const productsToSave = [] as Product[];
 
-      const op = new OrderProducts();
-      op.productId = orderProduct.productId;
-      op.quantity = orderProduct.quantity;
-      op.price = foundProduct.price * orderProduct.quantity;
+      for (const orderProduct of orderProducts) {
+        const foundProduct = await productRepository.findOneBy({
+          id: orderProduct.productId,
+        });
 
-      newOrder.orderProducts.push(op);
-    }
+        if (!foundProduct) {
+          throw new Error(`Product (${orderProduct.productId}) not found`);
+        }
 
-    foundUser.orders.push(newOrder);
+        if (foundProduct.stock < orderProduct.quantity) {
+          throw new Error(
+            `Not enough stock for product (${orderProduct.productId})`
+          );
+        }
 
-    const result = await userRepository.save(foundUser);
+        foundProduct.stock -= orderProduct.quantity;
 
-    res.status(201).json(result);
+        const op = new OrderProducts();
+        op.productId = orderProduct.productId;
+        op.quantity = orderProduct.quantity;
+        op.price = foundProduct.price * orderProduct.quantity;
+
+        newOrder.orderProducts.push(op);
+        productsToSave.push(foundProduct);
+      }
+      await productRepository.save(productsToSave);
+
+      foundUser.orders.push(newOrder);
+
+      const result = await userRepository.save(foundUser);
+
+      res.status(201).json(result);
+    });
   } catch (error) {
     next(error);
   }
