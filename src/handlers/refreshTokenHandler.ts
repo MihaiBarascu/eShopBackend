@@ -51,6 +51,7 @@ const refreshToken = async (
             roles: uniqueRoleIds,
             permissions: uniquePermissionIds,
             id: Number(foundUser.id),
+            uuid: foundUser.uuid,
           },
         },
         ACCESS_TOKEN_SECRET!,

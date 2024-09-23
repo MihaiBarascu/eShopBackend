@@ -54,3 +54,4 @@ const createProductImage = async (
 export default { createProductImage, create, get, getByID, update, deleteById };
 
 //trimit id produs
+//dupa ce le organizez shimb id cu unic id

@@ -51,6 +51,7 @@ const login = async (
           roles: uniqueRoleIds,
           permissions: uniquePermissionIds,
           id: Number(user.id),
+          uuid: user.uuid,
         },
       },
       ACCESS_TOKEN_SECRET!,

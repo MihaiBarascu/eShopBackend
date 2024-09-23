@@ -1,20 +1,20 @@
 import express, { Express, Request, Response } from "express";
 
-import usersRouter from "./controllers/users";
+import usersRouter from "./routes/users";
 
-import productsRouter from "./controllers/products";
-import categoriesRouter from "./controllers/categories";
-import ordersRouter from "./controllers/orders";
-import orderProductsRouter from "./controllers/orderProducts";
-import authRouter from "./controllers/auth";
-import rolesRouter from "./controllers/roles";
-import permissionsRouter from "./controllers/permissions";
+import productsRouter from "./routes/products";
+import categoriesRouter from "./routes/categories";
+import ordersRouter from "./routes/orders";
+import orderProductsRouter from "./routes/orderProducts";
+import authRouter from "./routes/auth";
+import rolesRouter from "./routes/roles";
+import permissionsRouter from "./routes/permissions";
 import { pagination } from "./middlewares/paginationMiddleware";
 import cookieParser from "cookie-parser";
-import refreshTokenRouter from "./controllers/refresh";
-import logoutRouter from "./controllers/logout";
+import refreshTokenRouter from "./routes/refresh";
+import logoutRouter from "./routes/logout";
 import morgan from "morgan";
-import registerRouter from "./controllers/register";
+import registerRouter from "./routes/register";
 
 const app: Express = express();
 

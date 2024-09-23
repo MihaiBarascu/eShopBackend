@@ -9,8 +9,52 @@ import { extendedRequest } from "../utils/types";
 import Order from "../database/entity/Order";
 import OrderProducts from "../database/entity/OrderProducts";
 import Product from "../database/entity/Product";
+import {
+  aggregateOrderProducts,
+  findUserById,
+  validateAndPrepareProducts,
+  createNewOrder,
+} from "../services/userOrderService";
+
+import { transactionContext } from "../database/transactionContext";
+import { error } from "console";
+import { UserController } from "../controllers/user/UserController";
+
 const get = shared.get(User);
 const deleteById = shared.deleteById(User);
+
+const userController = new UserController();
+
+const testUsersList = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const offset = Number(req.query.offset) || 0;
+    const limit = Number(req.query.limit) || 10;
+    console.log(
+      await userController.deleteUserByEmail("maria.ionescu@gmail.com")
+    );
+    return res.json(await userController.listUsers(offset, limit));
+  } catch (err) {
+    next(err);
+  }
+};
+
+const getUserByUuid = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const foundUser = await userController.getUserByUuid(req.params.uuid);
+
+    return res.json(foundUser);
+  } catch (error) {
+    next(error);
+  }
+};
 
 const createOrderByUserId = async (
   req: Request,
@@ -18,60 +62,36 @@ const createOrderByUserId = async (
   next: NextFunction
 ) => {
   try {
-    const userRepository = AppDataSource.getRepository(User);
-    const productRepository = AppDataSource.getRepository(Product);
+    await transactionContext(async (transactionManager) => {
+      const userRepository = transactionManager.getRepository(User);
+      const productRepository = transactionManager.getRepository(Product);
 
-    const { orderProducts } = req.body;
-    const userId = Number(req.params.userId);
+      let { orderProducts } = req.body;
+      orderProducts = aggregateOrderProducts(orderProducts);
 
-    const foundUser = await userRepository.findOne({
-      where: { id: userId },
-      relations: ["orders", "orders.orderProducts"],
+      if (!orderProducts || !orderProducts.length) {
+        throw new Error("No products added to order");
+      }
+
+      const userId = Number(req.params.userId);
+      const foundUser = await findUserById(userRepository, userId);
+
+      if (!foundUser) {
+        throw new Error(`User(${userId}) not found`);
+      }
+
+      const { productsToUpdate, orderProductsToSave } =
+        await validateAndPrepareProducts(productRepository, orderProducts);
+
+      await productRepository.save(productsToUpdate);
+
+      const newOrder = createNewOrder(orderProductsToSave);
+      foundUser.orders.push(newOrder);
+
+      const result = await userRepository.save(foundUser);
+
+      res.status(201).json(result);
     });
-
-    if (!foundUser) {
-      return res.status(404).json({ message: `User(${userId}) not found` });
-    }
-
-    if (!orderProducts || !orderProducts.length) {
-      return res.status(400).json({ message: `No products added to order` });
-    }
-
-    const newOrder = new Order();
-    newOrder.orderProducts = [] as OrderProducts[];
-
-    for (const orderProduct of orderProducts) {
-      const foundProduct = await productRepository.findOneBy({
-        id: orderProduct.productId,
-      });
-
-      if (!foundProduct) {
-        return res
-          .status(404)
-          .json({ message: `Product (${orderProduct.productId}) not found` });
-      }
-
-      if (foundProduct.stock < orderProduct.quantity) {
-        return res.status(404).json({
-          message: `Not enough stock for product (${orderProduct.productId})`,
-        });
-      }
-
-      foundProduct.stock -= orderProduct.quantity;
-
-      const op = new OrderProducts();
-      op.productId = orderProduct.productId;
-      op.quantity = orderProduct.quantity;
-      op.price = foundProduct.price * orderProduct.quantity;
-
-      newOrder.orderProducts.push(op);
-    }
-
-    foundUser.orders.push(newOrder);
-
-    const result = await userRepository.save(foundUser);
-
-    res.status(201).json(result);
   } catch (error) {
     next(error);
   }
@@ -233,14 +253,18 @@ export const listOrders = async (
 export default {
   createUser,
   get,
+  getUserByUuid,
   getUserByID,
   updateUser,
   deleteById,
   listOrders,
   deleteUserById,
   createOrderByUserId,
+  testUsersList,
 };
 
 //byuid
 //teste la toate enitatile
 //controllerul nu stie de request response da doar raspunusl la handler
+// unic id in rute
+//teste pe controllerele

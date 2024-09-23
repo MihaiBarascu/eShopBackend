@@ -5,5 +5,5 @@ export interface extendedRequest extends Request {
   roles?: number[];
   permissions?: string[];
   id?: number;
+  uuid?: string;
 }
-
