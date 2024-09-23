@@ -96,13 +96,13 @@ export class UserController {
     return await userRepository.save(user);
   };
 
-  deleteUser = async (userId: number): Promise<void> => {
-    const userRepository = AppDataSource.getRepository(User);
-    const user = await userRepository.findOneByOrFail({ id: userId });
-    await userRepository.softDelete({ id: user.id });
-  };
+  // deleteUser = async (userId: number): Promise<void> => {
+  //   const userRepository = AppDataSource.getRepository(User);
+  //   const user = await userRepository.findOneByOrFail({ id: userId });
+  //   await userRepository.softDelete({ id: user.id });
+  // };
 
-  deleteUser2 = async (userId: number): Promise<void> => {
+  deleteUser = async (userId: number): Promise<void> => {
     await deleteById<User>(User, userId);
   };
 
@@ -173,4 +173,3 @@ export class UserController {
     await deleteByCriteria<User>(User, { email });
   };
 }
-

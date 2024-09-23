@@ -21,6 +21,7 @@ export default function verifyJWT(
     request.roles = (decoded as JwtPayload).UserInfo.roles;
     request.permissions = (decoded as JwtPayload).UserInfo.permissions;
     request.id = (decoded as JwtPayload).UserInfo.id;
+    request.uuid = (decoded as JwtPayload).UserInfo.uuid;
     console.log(request.email, request.roles, request.permissions, request.id);
     next();
   });

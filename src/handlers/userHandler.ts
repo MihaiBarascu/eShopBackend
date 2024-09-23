@@ -33,9 +33,7 @@ const testUsersList = async (
   try {
     const offset = Number(req.query.offset) || 0;
     const limit = Number(req.query.limit) || 10;
-    console.log(
-      await userController.deleteUserByEmail("maria.ionescu@gmail.com")
-    );
+
     return res.json(await userController.listUsers(offset, limit));
   } catch (err) {
     next(err);
