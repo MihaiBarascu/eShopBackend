@@ -52,11 +52,9 @@ const createOrderByUserId = async (
       }
 
       if (foundProduct.stock < orderProduct.quantity) {
-        return res
-          .status(404)
-          .json({
-            message: `Not enough stock for product (${orderProduct.productId})`,
-          });
+        return res.status(404).json({
+          message: `Not enough stock for product (${orderProduct.productId})`,
+        });
       }
 
       foundProduct.stock -= orderProduct.quantity;
@@ -242,3 +240,7 @@ export default {
   deleteUserById,
   createOrderByUserId,
 };
+
+//byuid
+//teste la toate enitatile
+//controllerul nu stie de request response da doar raspunusl la handler
