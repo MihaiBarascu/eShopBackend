@@ -52,7 +52,7 @@ export class UserController {
     });
   };
 
-  addRole = async (userId: number, roleId: number): Promise<User> => {
+  addRole = async (uuid: string, roleId: number): Promise<User> => {
     const roleRepository = AppDataSource.getRepository(Role);
     const role = await roleRepository.findOneOrFail({
       where: { id: roleId },
@@ -60,34 +60,40 @@ export class UserController {
 
     const userRepository = AppDataSource.getRepository(User);
     const user = await userRepository.findOneOrFail({
-      where: { id: userId },
+      where: { uuid: uuid },
       relations: ["roles"],
     });
+
+    if (user.roles.findIndex((role) => role.id === roleId) !== -1) {
+      throw new Error(`User with email ${user.email} is allready ${role.name}`);
+    }
+
     user.roles.push(role);
     return await userRepository.save(user);
   };
 
-  removeRole = async (userId: number, roleId: number): Promise<User> => {
+  removeRole = async (uuid: string, roleId: number): Promise<User> => {
     const roleRepository = AppDataSource.getRepository(Role);
     const role = await roleRepository.findOneOrFail({
       where: { id: roleId },
     });
     const userRepository = AppDataSource.getRepository(User);
     const user = await userRepository.findOneOrFail({
-      where: { id: userId },
+      where: { uuid: uuid },
       relations: ["roles"],
     });
+
     user.roles = user.roles.filter((userRole) => userRole.id !== role.id);
     return await userRepository.save(user);
   };
 
   updateUser = async (
-    userId: number,
+    uuid: string,
     updateUserDto: UpdateUserDto
   ): Promise<User> => {
     const userRepository = AppDataSource.getRepository(User);
     const user = await userRepository.findOneOrFail({
-      where: { id: userId },
+      where: { uuid },
       relations: ["roles"],
     });
     user.firstName = updateUserDto?.firstName ?? user.firstName;
@@ -107,8 +113,8 @@ export class UserController {
   };
 
   listUsers = async (
-    offset: number = 0,
-    limit: number = 10
+    offset: number | undefined = undefined,
+    limit: number | undefined = undefined
   ): Promise<PaginationResponse<User>> => {
     return await get<User>(User, offset, limit);
   };
@@ -118,23 +124,34 @@ export class UserController {
   };
 
   getUserByUuid = async (uuid: string): Promise<User | null> => {
-    return (await get<User>(User, 0, 1, { uuid })).data[0];
+    return (await get<User>(User, undefined, undefined, { uuid })).data[0];
+  };
+
+  getUserWithOrders = async (uuid: string): Promise<User | null> => {
+    return (await get<User>(User, undefined, undefined, { uuid }, ["orders"]))
+      .data[0];
   };
 
   listOrders = async (
-    userId: number,
-    offset: number = 0,
-    limit: number = 10
+    uuid: string,
+    offset: number | undefined = undefined,
+    limit: number | undefined = undefined
   ): Promise<PaginationResponse<Order>> => {
-    return await get<Order>(Order, offset, limit, { userId });
+    return await get<Order>(Order, offset, limit, { user: { uuid: uuid } }, [
+      "user",
+      "orderProducts",
+    ]);
   };
 
   getOrder = async (userId: number, orderId: number): Promise<Order> => {
-    return (await get<Order>(Order, 0, 1, { id: orderId, userId })).data[0];
+    //uuid
+    return (
+      await get<Order>(Order, undefined, undefined, { id: orderId, userId })
+    ).data[0];
   };
 
   createOrder = async (
-    userId: number,
+    userUuid: string,
     ordr: CreateUserOrderDto
   ): Promise<Order> => {
     const newOrder = await transactionContext(async (transactionManager) => {
@@ -148,7 +165,7 @@ export class UserController {
         throw new Error("No products added to order");
       }
 
-      const foundUser = await findUserById(userRepository, userId);
+      const foundUser = await this.getUserWithOrders(userUuid);
       if (!foundUser) {
         throw new Error("No user found");
       }
@@ -159,6 +176,10 @@ export class UserController {
       await productRepository.save(productsToUpdate);
 
       const newOrder = createNewOrder(orderProductsToSave);
+
+      console.log("---aici-----");
+      console.log(newOrder);
+      console.log("---aici-------");
 
       foundUser.orders.push(newOrder);
 

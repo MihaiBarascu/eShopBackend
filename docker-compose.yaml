@@ -24,6 +24,7 @@ services:
     volumes:
       - ./:/app
       - /app/node_modules
+      - /app/tests
     environment:
       NODE_ENV: development
       DB_HOST: mysql

@@ -19,9 +19,6 @@ import {
 import { transactionContext } from "../database/transactionContext";
 import { error } from "console";
 import { UserController } from "../controllers/user/UserController";
-import { CreateUserDto, UpdateUserDto } from "../dto/user.dto";
-import { CreateUserOrderDto } from "../dto/userOrder.dto";
-import { plainToInstance } from "class-transformer";
 
 const get = shared.get(User);
 const deleteById = shared.deleteById(User);
@@ -57,65 +54,15 @@ const getUserByUuid = async (
   }
 };
 
-const addUserRole = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const roleId = Number(req.body.roleToAdd);
-    if (!roleId)
-      return res
-        .status(400)
-        .json({ message: "roleToAdd field is missing from body" });
-
-    const updatedUser = await userController.addRole(
-      req.params.uuid,
-      req.body.roleToAdd
-    );
-
-    const roles = updatedUser.roles.map((role) => role.name);
-
-    return res.status(200).json({ updatedRoles: roles });
-  } catch (error) {
-    next(error);
-  }
-};
-
-const removeUserRole = async (
+const createOrderByUserId = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const roleId = Number(req.params.roleId);
-    if (!roleId)
-      return res.status(400).json({ message: "roleId param is missing" });
-
-    const updatedUser = await userController.removeRole(
-      req.params.uuid,
-      roleId
-    );
-    return res.status(200).json(updatedUser);
-  } catch (error) {
-    next(error);
-  }
-};
-
-const createOrder = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const userUuid = req.params.uuid;
-    const order: CreateUserOrderDto = req.body.userOrder;
-
-    console.log(order);
-
-    if (!order) {
-      return res
-        .status(400)
-        .json({ message: "userOrder is missing for request body" });
-    }
-
-    const result = await userController.createOrder(userUuid, order);
-
-    return res.status(200).json(result);
-  } catch (error) {
-    next(error);
+    return res.status(404);
+  } catch (err) {
+    next(err);
   }
 };
 
@@ -171,60 +118,104 @@ const createUser = async (
   next: NextFunction
 ) => {
   try {
-    const { firstName, lastName, email, password } = request.body;
-    const user = new CreateUserDto();
+    const repository = AppDataSource.getRepository(User);
+    const roleRepository = AppDataSource.getRepository(Role);
 
+    const { firstName, lastName, email, password, roles } = request.body;
+    const user = new User();
+
+    if (roles.length && roles) {
+      const foundRoles = await roleRepository.findBy({
+        id: In(roles),
+      });
+      if (foundRoles.length !== roles.length) {
+        return response.status(400).send("Invalid roles");
+      }
+      user.roles = foundRoles;
+    }
     user.firstName = firstName;
     user.lastName = lastName;
     user.email = email;
-    user.password = password;
+    user.password = await hashPassword(password);
 
-    await userController.createUser(user);
-
-    const userDetails = { firstName, lastName, email, password: "******" };
-
-    return response.status(200).json(userDetails);
+    const result = await repository.save(user);
+    if (result) {
+      response.status(201).json(result);
+    }
   } catch (error) {
     next(error);
   }
 };
 
-const updateUser = async (
-  request: Request,
-  response: Response,
-  next: NextFunction
-) => {
-  try {
-    const user: UpdateUserDto = request.body;
-    const uuid = request.params.uuid;
+// const updateUser = async (
+//   request: Request,
+//   response: Response,
+//   next: NextFunction
+// ) => {
+//   try {
+//     const userRepository = AppDataSource.getRepository(User);
 
-    const updatedUser = await userController.updateUser(uuid, user);
+//     const roleRepository = AppDataSource.getRepository(Role);
+//     const user = request.body;
 
-    const { firstName, lastName, email } = updatedUser;
+//     const userToUpdate = await userRepository.findOneBy({
+//       id: Number(request.params.id),
+//     });
+//     if (!userToUpdate) {
+//       return response.status(404).json({ message: "User not found" });
+//     }
 
-    const userDetails = { firstName, lastName, email };
+//     userToUpdate.firstName = user.firstName || userToUpdate.firstName;
+//     userToUpdate.lastName = user.lastName || userToUpdate.lastName;
+//     userToUpdate.email = user.email || userToUpdate.email;
+//     userToUpdate.roles = user.roles || userToUpdate.roles;
 
-    return response.status(200).json(userDetails);
-  } catch (error) {
-    next(error);
-  }
-};
+//     if (user.password) {
+//       userToUpdate.password = await hashPassword(user.password);
+//     }
 
-const listOrders = async (
+//     if (user.roles && user.roles.length) {
+//       const foundRoles = await roleRepository.findBy({
+//         id: In(user.roles),
+//       });
+//       if (foundRoles.length !== user.roles.length) {
+//         return response.status(400).send("Invalid roles");
+//       }
+//       userToUpdate.roles = foundRoles;
+//     }
+
+//     const result = await userRepository.save(userToUpdate);
+
+//     return response.status(200).json(result);
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+export const listOrders = async (
   req: extendedRequest,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const uuid = req.params.uuid;
-    const offset = Number(req.query.offset) || undefined;
-    const limit = Number(req.query.limit) || undefined;
+    const userId = Number(req.params.userId);
 
-    return res
-      .status(200)
-      .json(await userController.listOrders(uuid, offset, limit));
-  } catch (error) {
-    next(error);
+    const orderRepository = AppDataSource.getRepository(Order);
+
+    const orders = await orderRepository.find({
+      where: { userId: userId },
+      relations: ["orderProducts", "orderProducts.product"],
+    });
+
+    if (orders.length === 0) {
+      return res
+        .status(404)
+        .json({ message: `No ordres for user(${req.params.userId})` });
+    }
+
+    res.status(200).json(orders);
+  } catch (err) {
+    next(err);
   }
 };
 
@@ -233,14 +224,12 @@ export default {
   get,
   getUserByUuid,
   getUserByID,
-  addUserRole,
+
   deleteById,
   listOrders,
   deleteUserById,
+  createOrderByUserId,
   getUsersList,
-  removeUserRole,
-  createOrder,
-  updateUser,
 };
 
 //byuid

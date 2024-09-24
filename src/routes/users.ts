@@ -11,34 +11,45 @@ import { CreateUserOrderDto } from "../dto/userOrder.dto";
 
 const usersRouter = Router();
 
-usersRouter.get("/", userHandler.testUsersList);
+usersRouter.post("/:uuid/orders", userHandler.createOrder);
+usersRouter.get("/:uuid/orders", userHandler.listOrders);
+usersRouter.post("/", userHandler.createUser);
+usersRouter.put("/:uuid", userHandler.updateUser);
+usersRouter.post("/:uuid/roles", userHandler.addUserRole);
+usersRouter.delete("/:uuid/roles/:roleId", userHandler.removeUserRole);
 
-usersRouter.use(verifyJWT);
+// usersRouter.use(verifyJWT);
 
-usersRouter.param("uuid", verifyUuidParamMiddleware);
-usersRouter.get("/:uuid", userHandler.getUserByUuid);
+// usersRouter.param("uuid", verifyUuidParamMiddleware);
+// usersRouter.get("/:uuid", userHandler.getUserByUuid);
 
-usersRouter.delete("/:userId", userHandler.deleteUserById);
-usersRouter.get("/:userId/orders", userHandler.listOrders);
-usersRouter.post(
-  "/:userId/orders",
-  validateBodyMiddleware(CreateUserOrderDto),
-  userHandler.createOrderByUserId
-);
+// usersRouter.post("/:uuid/roles", userHandler.addUserRole);
+// usersRouter.delete("/:uuid/roles/:roleId", userHandler.removeUserRole);
 
-usersRouter.use(verifyRoles(ROLES_LIST.Admin));
-usersRouter.put(
-  "/:id",
-  validateBodyMiddleware(UpdateUserDto),
-  userHandler.updateUser
-);
+// usersRouter.delete("/:userId", userHandler.deleteUserById);
+// usersRouter.get("/:userId/orders", userHandler.listOrders);
+// usersRouter.post(
+//   "/:userId/orders",
+//   validateBodyMiddleware(CreateUserOrderDto),
+//   userHandler.createOrderByUserId
+// );
 
-usersRouter.get("/", userHandler.get);
-usersRouter.post(
-  "/",
-  validateBodyMiddleware(CreateUserDto),
-  userHandler.createUser
-);
+// usersRouter.use(verifyRoles(ROLES_LIST.Admin));
+
+// usersRouter.get("/", userHandler.getUsersList);
+
+// // usersRouter.put(
+// //   "/:id",
+// //   validateBodyMiddleware(UpdateUserDto),
+// //   userHandler.updateUser
+// // );
+
+// usersRouter.get("/", userHandler.getUsersList);
+// usersRouter.post(
+//   "/",
+//   validateBodyMiddleware(CreateUserDto),
+//   userHandler.createUser
+// );
 
 // router.delete("/:userId", handler.deleteUser);
 // router.post("/:userId/roles/:roleId", handler.addRole);

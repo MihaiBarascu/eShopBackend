@@ -1,5 +1,5 @@
 import { AppDataSource } from "../database/data-source";
-import { EntityTarget, FindOptionsWhere } from "typeorm";
+import { EntityTarget, FindOptionsWhere, FindOptionsRelations } from "typeorm";
 
 import { PaginationResponse } from "../interfaces";
 
@@ -35,16 +35,18 @@ export const deleteByCriteria = async <T extends object>(
 
 export const get = async <T extends object>(
   type: EntityTarget<T>,
-  offset: number = 0,
-  limit: number = 10,
-  searchCriteria: FindOptionsWhere<T> = {}
+  offset: number | undefined = undefined,
+  limit: number | undefined = undefined,
+  searchCriteria: FindOptionsWhere<T> = {},
+  relations: string[] = []
 ): Promise<PaginationResponse<T>> => {
   const repository = AppDataSource.getRepository(type);
 
   const [values, total] = await repository.findAndCount({
-    where: searchCriteria,
-    skip: offset,
-    take: limit,
+    where: searchCriteria || {},
+    skip: offset || undefined,
+    take: limit || undefined,
+    relations: relations,
   });
 
   if (values.length == 0) {
@@ -54,11 +56,11 @@ export const get = async <T extends object>(
   return {
     data: values,
     meta: {
-      limit: limit,
-      offset: offset,
-      page: Math.floor(offset / limit) + 1,
+      limit: limit ?? 0,
+      offset: offset ?? 0,
+      page: offset && limit ? Math.floor(offset / limit) + 1 : 1,
       total: total,
-      pages: Math.ceil(total / limit),
+      pages: limit ? Math.ceil(total / limit) : 0,
     },
   };
 };

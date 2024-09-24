@@ -8,6 +8,9 @@ import { UserOrderProdDto } from "../dto/userOrderProducts.dto";
 export const aggregateOrderProducts = (
   orderProducts: UserOrderProdDto[]
 ): UserOrderProdDto[] => {
+  console.log("----------------");
+  console.log(orderProducts);
+  console.log("----------------");
   return Object.values(
     orderProducts.reduce((acc, curr) => {
       if (acc[curr.productId]) {
