@@ -11,6 +11,7 @@ import { CreateUserOrderDto } from "../dto/userOrder.dto";
 
 const usersRouter = Router();
 
+usersRouter.get("/", userHandler.getUsersList);
 usersRouter.post("/:uuid/orders", userHandler.createOrder);
 usersRouter.get("/:uuid/orders", userHandler.listOrders);
 usersRouter.post("/", userHandler.createUser);

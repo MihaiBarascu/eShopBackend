@@ -38,7 +38,7 @@ export const get = async <T extends object>(
   offset: number | undefined = undefined,
   limit: number | undefined = undefined,
   searchCriteria: FindOptionsWhere<T> = {},
-  relations: string[] = []
+  relations: FindOptionsRelations<T> = {}
 ): Promise<PaginationResponse<T>> => {
   const repository = AppDataSource.getRepository(type);
 
@@ -64,4 +64,3 @@ export const get = async <T extends object>(
     },
   };
 };
-
