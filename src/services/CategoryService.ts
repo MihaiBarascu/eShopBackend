@@ -10,9 +10,9 @@ export class CategoryService {
     let idIndexValueData: (string | null)[] = Array(maxId + 1).fill(null);
 
     categories.forEach((category) => {
-      idIndexValueParentId[category.id] = category.parentId;
+      idIndexValueParentId[category.id] = category.parentId || -1;
     });
-    idIndexValueParentId[0] = -1;
+    idIndexValueParentId[0] = null;
 
     categories.forEach((category) => {
       idIndexValueData[category.id] = category.name;
@@ -24,7 +24,7 @@ export class CategoryService {
     };
 
     const categNode: Nod = {
-      nodeId: null,
+      nodeId: -1,
       children: [],
     };
 
@@ -32,7 +32,7 @@ export class CategoryService {
       if (idIndexValueParentId.every((val) => val === null)) return;
 
       idIndexValueParentId.forEach((parentId, id) => {
-        if (parentId === nod.nodeId) {
+        if (parentId === nod.nodeId && parentId !== null) {
           nod.children.push({ nodeId: id, children: [] });
           idIndexValueParentId[id] = null;
           nod.children.forEach((node) => {
@@ -72,7 +72,7 @@ export class CategoryService {
         .map((child: any) => generate(child))
         .join("");
       return `<li>${nodeName} (${
-        node.nodeId ?? ""
+        node.nodeId !== -1 ? node.nodeId : ""
       })<ul>${childrenHtml}</ul></li>`;
     };
 
