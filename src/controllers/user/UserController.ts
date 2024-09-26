@@ -1,4 +1,4 @@
-import { UserService } from "../../services/userService";
+import { UserService } from "../../services/UserService";
 import { CreateUserDto, UpdateUserDto } from "../../dto/user.dto";
 import { User } from "../../database/entity/User";
 import { PaginationResponse } from "../../interfaces";
@@ -85,3 +85,5 @@ export class UserController {
     await this.userService.deleteUserByEmail(email);
   };
 }
+
+////parent id, id din acceasi tabela, is active categroie, is active produse,
