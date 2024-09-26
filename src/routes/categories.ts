@@ -10,19 +10,9 @@ const categoriesRouter = Router();
 // router.get("/", handler.listUsers);
 // router.get("/:userId", handler.getUser);
 categoriesRouter.get("/", categoryHandler.get);
-categoriesRouter.get("/:id", categoryHandler.getByID);
-categoriesRouter.post(
-  "/",
-  validateBodyMiddleware(CreateCategoryDto),
-  categoryHandler.create
-);
-categoriesRouter.delete("/:id", categoryHandler.deleteById);
-categoriesRouter.put(
-  "/:id",
-  validateBodyMiddleware(UpdateCategoryDto),
-  categoryHandler.update
-);
-
+categoriesRouter.post("/", categoryHandler.create);
+categoriesRouter.get("/generate-tree", categoryHandler.getTree);
+categoriesRouter.get("/generate-html-list", categoryHandler.getHtmlList);
 // router.delete("/:userId", handler.deleteUser);
 // router.post("/:userId/roles/:roleId", handler.addRole);
 // router.delete("/:userId/roles/:roleId", handler.removeRole);

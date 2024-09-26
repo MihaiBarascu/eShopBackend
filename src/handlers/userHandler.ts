@@ -12,21 +12,9 @@ class UserHandler {
 
   constructor() {
     this.userController = new UserController();
-
-    this.userController = new UserController();
-    this.getUsersList = this.getUsersList.bind(this);
-    this.getUserByUuid = this.getUserByUuid.bind(this);
-    this.addUserRole = this.addUserRole.bind(this);
-    this.removeUserRole = this.removeUserRole.bind(this);
-    this.createOrder = this.createOrder.bind(this);
-    this.deleteUserById = this.deleteUserById.bind(this);
-    this.getUserByID = this.getUserByID.bind(this);
-    this.createUser = this.createUser.bind(this);
-    this.updateUser = this.updateUser.bind(this);
-    this.listOrders = this.listOrders.bind(this);
   }
 
-  async getUsersList(req: Request, res: Response, next: NextFunction) {
+  getUsersList = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const offset = Number(req.query.offset) || undefined;
       const limit = Number(req.query.limit) || undefined;
@@ -35,9 +23,11 @@ class UserHandler {
     } catch (err) {
       next(err);
     }
-  }
+  };
 
-  async getUserByUuid(req: Request, res: Response, next: NextFunction) {
+  //forget password link tooken atasat si duce la o ruta
+
+  getUserByUuid = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const foundUser = await this.userController.getUserByUuid(
         req.params.uuid
@@ -46,9 +36,9 @@ class UserHandler {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  async addUserRole(req: Request, res: Response, next: NextFunction) {
+  addUserRole = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const roleId = Number(req.body.roleToAdd);
       if (!roleId)
@@ -67,9 +57,9 @@ class UserHandler {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  async removeUserRole(req: Request, res: Response, next: NextFunction) {
+  removeUserRole = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const roleId = Number(req.params.roleId);
       if (!roleId)
@@ -83,12 +73,12 @@ class UserHandler {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  async createOrder(req: Request, res: Response, next: NextFunction) {
+  createOrder = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userUuid = req.params.uuid;
-      const order: CreateUserOrderDto = req.body.userOrder;
+      const order: CreateUserOrderDto = req.body;
 
       if (!order) {
         return res
@@ -102,9 +92,9 @@ class UserHandler {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  async deleteUserById(req: Request, res: Response, next: NextFunction) {
+  deleteUserById = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const result = await AppDataSource.getRepository(User).delete(
         req.params.userId
@@ -119,9 +109,9 @@ class UserHandler {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  async getUserByID(req: Request, res: Response, next: NextFunction) {
+  getUserByID = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const repository = AppDataSource.getRepository(User);
       const foundUser = await repository.findOneBy({
@@ -138,9 +128,9 @@ class UserHandler {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  async createUser(req: Request, res: Response, next: NextFunction) {
+  createUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { firstName, lastName, email, password } = req.body;
       const user = new CreateUserDto();
@@ -158,9 +148,9 @@ class UserHandler {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  async updateUser(req: Request, res: Response, next: NextFunction) {
+  updateUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user: UpdateUserDto = req.body;
       const uuid = req.params.uuid;
@@ -175,9 +165,13 @@ class UserHandler {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  async listOrders(req: extendedRequest, res: Response, next: NextFunction) {
+  listOrders = async (
+    req: extendedRequest,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const uuid = req.params.uuid;
       const offset = Number(req.query.offset) || undefined;
@@ -189,7 +183,7 @@ class UserHandler {
     } catch (error) {
       next(error);
     }
-  }
+  };
 }
 
 const userHandler = new UserHandler();

@@ -11,8 +11,6 @@ const logout = async (
   next: NextFunction
 ) => {
   try {
-    if (!REFRESH_TOKEN_SECRET) return response.sendStatus(404);
-
     const cookies = request.cookies;
     if (!cookies?.jwt) return response.sendStatus(204);
 
@@ -49,4 +47,3 @@ const logout = async (
   }
 };
 export default logout;
-

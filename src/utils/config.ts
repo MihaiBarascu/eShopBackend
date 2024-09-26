@@ -13,7 +13,7 @@ export const DB_MIGRATIONS =
   process.env.DB_MIGRATIONS || "src/migration/**/*.ts";
 export const DB_CLI_MIGRATIONS_DIR =
   process.env.DB_CLI_MIGRATIONS_DIR || "src/migration";
-export const SALT_ROUNDS = process.env.SALT_ROUNDS || 10;
+export const SALT_ROUNDS = Number(process.env.SALT_ROUNDS) || 10;
 export const MAX_FILE_SIZE =
   Number(process.env.MAX_FILE_SIZE) || 5 * 1024 * 1024;
 
@@ -21,6 +21,11 @@ export const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 if (!ACCESS_TOKEN_SECRET) throw new Error("undefined access token secret");
 export const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 if (!REFRESH_TOKEN_SECRET) throw new Error("undefined refresh token secret");
+
+export const PASSWORD_RESET_TOKEN_SECRET =
+  process.env.PASSWORD_RESET_TOKEN_SECRET;
+if (!PASSWORD_RESET_TOKEN_SECRET)
+  throw new Error("undefiend password reset token secret");
 
 export const ROLES_LIST = {
   Admin: 1,

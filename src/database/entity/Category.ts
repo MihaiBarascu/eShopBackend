@@ -7,6 +7,8 @@ import {
   ManyToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from "typeorm";
 import { v4 } from "uuid";
 import Product from "./Product";
@@ -19,10 +21,13 @@ export default class Category {
   @Column("uuid")
   uuid: string;
 
+  @Column({ nullable: true })
+  parentId: number;
+
   @Column({ length: 100, nullable: false })
   name: string;
 
-  @Column({ length: 255, nullable: false })
+  @Column({ length: 255, nullable: true })
   description: string;
 
   @CreateDateColumn()
@@ -41,5 +46,9 @@ export default class Category {
   addUuid() {
     this.uuid = v4();
   }
+
+  @ManyToOne(() => Category, (category) => category.id)
+  @JoinColumn({ name: "parentId" })
+  parent: Category;
 }
 

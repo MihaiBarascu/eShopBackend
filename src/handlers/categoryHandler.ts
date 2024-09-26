@@ -1,16 +1,62 @@
 import { Request, Response, NextFunction } from "express";
-import { plainToInstance } from "class-transformer";
-import { validate } from "class-validator";
 import { AppDataSource } from "../database/data-source";
 import shared from "./shared";
-import Product from "../database/entity/Product";
-import Category from "../database/entity/Category";
+import { User } from "../database/entity/User";
+import { CategoryController } from "../controllers/CategoryController";
+import { CreateUserDto, UpdateUserDto } from "../dto/user.dto";
+import { CreateUserOrderDto } from "../dto/userOrder.dto";
+import { extendedRequest } from "../utils/types";
+import { CreateCategoryDto } from "../dto/category.dto";
+import { plainToInstance } from "class-transformer";
 
-const get = shared.get(Category);
-const deleteById = shared.deleteById(Category);
-const getByID = shared.getByID(Category);
-const create = shared.create(Category);
-const update = shared.update(Category);
+class CategoryHandler {
+  private categoryController: CategoryController;
 
-export default { create, get, getByID, update, deleteById };
+  constructor() {
+    this.categoryController = new CategoryController();
+  }
+
+  get = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      return res.json(await this.categoryController.get());
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  create = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const dto = plainToInstance(CreateCategoryDto, req.body);
+
+      const result = await this.categoryController.create(dto);
+
+      return res.json({ result });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  getTree = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const result = await this.categoryController.generateTree();
+
+      return res.json({ result });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  getHtmlList = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const htmlList = await this.categoryController.generateHtmlList();
+
+      return res.send(htmlList);
+    } catch (err) {
+      next(err);
+    }
+  };
+}
+
+const categoryHandler = new CategoryHandler();
+export default categoryHandler;
 

@@ -1,5 +1,10 @@
 import { AppDataSource } from "../database/data-source";
-import { EntityTarget, FindOptionsWhere, FindOptionsRelations } from "typeorm";
+import {
+  EntityTarget,
+  FindOptionsWhere,
+  FindOptionsRelations,
+  DeepPartial,
+} from "typeorm";
 
 import { PaginationResponse } from "../interfaces";
 
@@ -9,6 +14,15 @@ export const simpleGet = async <T extends object>(
   const repository = AppDataSource.getRepository(type);
   const entities = await repository.find();
   return entities;
+};
+export const simpleCreate = async <T extends object>(
+  type: EntityTarget<T>,
+  dto: DeepPartial<T>
+): Promise<T> => {
+  const repository = AppDataSource.getRepository(type);
+  const entity = repository.create(dto);
+  const savedEntity = await repository.save(entity);
+  return savedEntity;
 };
 
 export const deleteById = async <T extends object>(
@@ -35,10 +49,10 @@ export const deleteByCriteria = async <T extends object>(
 
 export const get = async <T extends object>(
   type: EntityTarget<T>,
-  offset: number | undefined = undefined,
-  limit: number | undefined = undefined,
   searchCriteria: FindOptionsWhere<T> = {},
-  relations: FindOptionsRelations<T> = {}
+  relations: FindOptionsRelations<T> = {},
+  offset: number | undefined = undefined,
+  limit: number | undefined = undefined
 ): Promise<PaginationResponse<T>> => {
   const repository = AppDataSource.getRepository(type);
 

@@ -1,4 +1,11 @@
-import { IsNotEmpty, IsOptional, IsString, Length } from "class-validator";
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Length,
+  IsNumber,
+  Min,
+} from "class-validator";
 
 export class CreateCategoryDto {
   @IsString({ message: "name must be a string" })
@@ -12,8 +19,13 @@ export class CreateCategoryDto {
   @Length(3, 255, {
     message: "description must be between 3 and 255 characters long",
   })
-  @IsNotEmpty({ message: "description is required" })
+  @IsOptional({ message: "description is required" })
   description: string;
+
+  @IsOptional()
+  @IsNumber({}, { message: "parentId must be a number" })
+  @Min(1, { message: "parentId must be a positive number > 0" })
+  parentId: number;
 }
 
 export class UpdateCategoryDto {
@@ -31,3 +43,4 @@ export class UpdateCategoryDto {
   })
   description: string;
 }
+

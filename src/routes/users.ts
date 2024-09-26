@@ -11,10 +11,20 @@ import { CreateUserOrderDto } from "../dto/userOrder.dto";
 
 const usersRouter = Router();
 
+usersRouter.post(
+  "/",
+  validateBodyMiddleware(CreateUserDto),
+  userHandler.createUser
+);
 usersRouter.get("/", userHandler.getUsersList);
-usersRouter.post("/:uuid/orders", userHandler.createOrder);
+
+usersRouter.post(
+  "/:uuid/orders",
+  validateBodyMiddleware(CreateUserOrderDto),
+  userHandler.createOrder
+);
 usersRouter.get("/:uuid/orders", userHandler.listOrders);
-usersRouter.post("/", userHandler.createUser);
+
 usersRouter.put("/:uuid", userHandler.updateUser);
 usersRouter.post("/:uuid/roles", userHandler.addUserRole);
 usersRouter.delete("/:uuid/roles/:roleId", userHandler.removeUserRole);

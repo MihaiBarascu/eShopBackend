@@ -28,11 +28,19 @@ export class UserService {
     return await repository.save(user);
   }
 
+  async resetPassword(userId: number, newPass: string): Promise<User> {
+    const foundUser = await this.getUser(userId);
+    foundUser.password = await hashPassword(newPass);
+
+    const repository = AppDataSource.getRepository(User);
+
+    return await repository.save(foundUser);
+  }
+
   async getUser(userId: number): Promise<User> {
     const userRepository = AppDataSource.getRepository(User);
     return await userRepository.findOneOrFail({
       where: { id: userId },
-      relations: ["roles", "orders"],
     });
   }
 
@@ -92,25 +100,23 @@ export class UserService {
     offset: number | undefined = undefined,
     limit: number | undefined = undefined
   ): Promise<PaginationResponse<User>> {
-    return await get<User>(User, offset, limit);
+    return await get<User>(User, undefined, undefined, offset, limit);
   }
 
   async getUserByEmailWithRoles(email: string): Promise<User | null> {
-    return (await get<User>(User, 0, 1, { email }, { roles: true })).data[0];
+    return (await get<User>(User, { email }, { roles: true })).data[0];
   }
 
   async getUserByEmail(email: string): Promise<User | null> {
-    return (await get<User>(User, 0, 1, { email })).data[0];
+    return (await get<User>(User, { email })).data[0];
   }
 
   async getUserByUuid(uuid: string): Promise<User | null> {
-    return (await get<User>(User, undefined, undefined, { uuid })).data[0];
+    return (await get<User>(User, { uuid })).data[0];
   }
 
   async getUserWithOrders(uuid: string): Promise<User | null> {
-    return (
-      await get<User>(User, undefined, undefined, { uuid }, { orders: true })
-    ).data[0];
+    return (await get<User>(User, { uuid }, { orders: true })).data[0];
   }
 
   async listOrders(
@@ -120,17 +126,15 @@ export class UserService {
   ): Promise<PaginationResponse<Order>> {
     return await get<Order>(
       Order,
-      offset,
-      limit,
       { user: { uuid: uuid } },
-      { user: true, orderProducts: true }
+      { user: true, orderProducts: true },
+      offset,
+      limit
     );
   }
 
   async getOrder(userId: number, orderId: number): Promise<Order> {
-    return (
-      await get<Order>(Order, undefined, undefined, { id: orderId, userId })
-    ).data[0];
+    return (await get<Order>(Order, { id: orderId, userId })).data[0];
   }
 
   async createOrder(
@@ -174,3 +178,5 @@ export class UserService {
   }
 }
 
+//ii trimit link la care atasez token de autentificare pe care ilg generez
+// ruta la un token pe care il generez
