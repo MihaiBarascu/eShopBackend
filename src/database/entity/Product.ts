@@ -44,6 +44,9 @@ export default class Product {
   @DeleteDateColumn()
   deletedAt: Date;
 
+  @Column({ nullable: false, default: true })
+  isActive: boolean;
+
   @ManyToMany(() => Category, (category) => category.products)
   @JoinTable({
     name: "product_categories",

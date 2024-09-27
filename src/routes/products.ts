@@ -6,24 +6,36 @@ import productHandler from "../handlers/productHandler";
 import { fileMiddleWare } from "../middlewares/fileMiddleware";
 
 const productsRouter = Router();
-// router.get("/:userId", handler.getUser);
-// router.get("/", handler.listUsers);
-// router.get("/:userId", handler.getUser);
-productsRouter.get("/", productHandler.get);
-productsRouter.get("/:id", productHandler.getByID);
+// // router.get("/:userId", handler.getUser);
+// // router.get("/", handler.listUsers);
+// // router.get("/:userId", handler.getUser);
+productsRouter.get("/", productHandler.getProductList);
+// productsRouter.get("/:id", productHandler.getByID);
 productsRouter.post(
   "/",
   validateBodyMiddleware(CreateProductDto),
   productHandler.createProduct
 );
-productsRouter.post("/:id/images", fileMiddleWare, productHandler.addImage);
 
-productsRouter.delete("/:id", productHandler.deleteById);
+productsRouter.get("/:productId", productHandler.getProductById);
+
+productsRouter.post("/:productId/categories", productHandler.addCategory);
+
 productsRouter.put(
-  "/:id",
+  "/:productId",
   validateBodyMiddleware(UpdateProductDto),
   productHandler.updateProduct
 );
+
+// );
+// productsRouter.post("/:id/images", fileMiddleWare, productHandler.addImage);
+
+// productsRouter.delete("/:id", productHandler.deleteById);
+// productsRouter.put(
+//   "/:id",
+//   validateBodyMiddleware(UpdateProductDto),
+//   productHandler.updateProduct
+// );
 
 // router.delete("/:userId", handler.deleteUser);
 // router.post("/:userId/roles/:roleId", handler.addRole);

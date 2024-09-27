@@ -9,6 +9,7 @@ import {
   ArrayNotEmpty,
   ArrayMinSize,
   ValidateNested,
+  IsBoolean,
 } from "class-validator";
 import Category from "../database/entity/Category";
 import { Type } from "class-transformer";
@@ -41,6 +42,10 @@ export class CreateProductDto {
   @Type(() => Number)
   @IsNumber({}, { each: true, message: "each category must be a number" })
   categories: number[];
+
+  @IsOptional()
+  @IsBoolean({ message: "isActive must be a boolean" })
+  isActive: boolean;
 }
 
 export class UpdateProductDto {
@@ -71,5 +76,9 @@ export class UpdateProductDto {
   @Type(() => Number)
   @IsNumber({}, { each: true, message: "each category must be a number" })
   categories: number[];
+
+  @IsOptional()
+  @IsBoolean({ message: "isActive must be a boolean" })
+  isActive: boolean;
 }
 

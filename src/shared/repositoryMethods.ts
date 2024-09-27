@@ -8,6 +8,15 @@ import {
 
 import { PaginationResponse } from "../interfaces";
 
+export const getById = async <T extends object>(
+  type: EntityTarget<T>,
+  id: number
+): Promise<T> => {
+  const repository = AppDataSource.getRepository(type);
+  const entity = await repository.findOneOrFail({ where: { id } as any });
+  return entity;
+};
+
 export const simpleGet = async <T extends object>(
   type: EntityTarget<T>
 ): Promise<T[]> => {
@@ -31,9 +40,17 @@ export const deleteById = async <T extends object>(
 ): Promise<void> => {
   const repository = AppDataSource.getRepository(type);
 
-  await repository.findOneOrFail({ id: id } as any);
+  await repository.findOneOrFail({ where: { id } as any });
 
-  await repository.softDelete({ id: id } as any);
+  await repository.softDelete(id);
+};
+export const restoreById = async <T extends { id: number }>(
+  type: EntityTarget<T>,
+  id: number
+): Promise<void> => {
+  const repository = AppDataSource.getRepository(type);
+
+  await repository.restore(id);
 };
 
 export const deleteByCriteria = async <T extends object>(
@@ -54,6 +71,10 @@ export const get = async <T extends object>(
   offset: number | undefined = undefined,
   limit: number | undefined = undefined
 ): Promise<PaginationResponse<T>> => {
+  if (offset && !limit) {
+    limit = 10;
+  }
+
   const repository = AppDataSource.getRepository(type);
 
   const [values, total] = await repository.findAndCount({

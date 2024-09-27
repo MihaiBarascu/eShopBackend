@@ -10,7 +10,7 @@ interface EntityWithID {
 
 interface CustomRequest extends Request {
   pagination?: {
-    page: number;
+    offset: number;
     limit: number;
   };
 }
@@ -36,17 +36,14 @@ function get<T extends object>(type: new () => T) {
     try {
       const repository = AppDataSource.getRepository(type);
 
-      const page: number | undefined = request.pagination?.page;
       const limit: number | undefined = request.pagination?.limit;
-      const values = await repository.find(
-        page && limit ? { skip: (page - 1) * limit, take: limit } : {}
-      );
+      const values = await repository.find({});
       const total = await repository.count();
 
       response.json({
         data: values,
         total: total,
-        page: page ?? undefined,
+
         perPage: limit ?? undefined,
         totalPages: limit ? Math.ceil(total / limit) : undefined,
       });

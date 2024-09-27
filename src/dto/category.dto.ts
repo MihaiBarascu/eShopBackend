@@ -5,6 +5,7 @@ import {
   Length,
   IsNumber,
   Min,
+  IsBoolean,
 } from "class-validator";
 
 export class CreateCategoryDto {
@@ -21,6 +22,10 @@ export class CreateCategoryDto {
   })
   @IsOptional({ message: "description is required" })
   description: string;
+
+  @IsOptional()
+  @IsBoolean({ message: "isActive must be a boolean" })
+  isActive: boolean;
 
   @IsOptional()
   @IsNumber({}, { message: "parentId must be a number" })
@@ -42,5 +47,14 @@ export class UpdateCategoryDto {
     message: "description must be between 3 and 255 characters long",
   })
   description: string;
+
+  @IsOptional()
+  @IsNumber({}, { message: "parentId must be a number" })
+  @Min(1, { message: "parentId must be a positive number > 0" })
+  parentId: number;
+
+  @IsOptional()
+  @IsBoolean({ message: "isActive must be a boolean" })
+  isActive: boolean;
 }
 

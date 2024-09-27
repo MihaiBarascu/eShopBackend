@@ -24,6 +24,9 @@ export default class Category {
   @Column({ nullable: true })
   parentId: number;
 
+  @Column({ nullable: false, default: true })
+  isActive: boolean;
+
   @Column({ length: 100, nullable: false })
   name: string;
 

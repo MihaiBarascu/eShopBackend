@@ -6,7 +6,7 @@ import { CategoryController } from "../controllers/CategoryController";
 import { CreateUserDto, UpdateUserDto } from "../dto/user.dto";
 import { CreateUserOrderDto } from "../dto/userOrder.dto";
 import { extendedRequest } from "../utils/types";
-import { CreateCategoryDto } from "../dto/category.dto";
+import { CreateCategoryDto, UpdateCategoryDto } from "../dto/category.dto";
 import { plainToInstance } from "class-transformer";
 
 class CategoryHandler {
@@ -16,9 +16,29 @@ class CategoryHandler {
     this.categoryController = new CategoryController();
   }
 
-  get = async (req: Request, res: Response, next: NextFunction) => {
+  getCategoryById = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      return res.json(await this.categoryController.get());
+      const categoryId = Number(req.params.categoryId);
+      if (!categoryId) {
+        return res
+          .status(400)
+          .json({ message: "invalid category id param or missing" });
+      }
+
+      return res.json(await this.categoryController.getCatById(categoryId));
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  getCategoryList = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const offset = Number(req.query.offset) || undefined;
+      const limit = Number(req.query.limit) || undefined;
+
+      return res.json(
+        await this.categoryController.listCategories(offset, limit)
+      );
     } catch (err) {
       next(err);
     }
@@ -53,6 +73,42 @@ class CategoryHandler {
       return res.send(htmlList);
     } catch (err) {
       next(err);
+    }
+  };
+
+  updateCategory = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const categoryId = Number(req.params.categoryId);
+      if (!categoryId) {
+        return res
+          .status(400)
+          .json({ message: "invalid category id param or missing" });
+      }
+
+      const categoryData = plainToInstance(UpdateCategoryDto, req.body);
+
+      return res.json(
+        await this.categoryController.updateCategory(categoryId, categoryData)
+      );
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  deleteCategory = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const categoryId = Number(req.params.categoryId);
+      if (!categoryId) {
+        return res
+          .status(400)
+          .json({ message: "invalid category id param or missing" });
+      }
+
+      return res.json(
+        await this.categoryController.deleteCateogryById(categoryId)
+      );
+    } catch (error) {
+      next(error);
     }
   };
 }

@@ -1,5 +1,6 @@
 import Category from "../database/entity/Category";
-
+import { UpdateCategoryDto } from "../dto/category.dto";
+import { AppDataSource } from "../database/data-source";
 export class CategoryService {
   constructor() {}
 
@@ -10,7 +11,10 @@ export class CategoryService {
     let idIndexValueData: (string | null)[] = Array(maxId + 1).fill(null);
 
     categories.forEach((category) => {
-      idIndexValueParentId[category.id] = category.parentId || -1;
+      // idIndexValueParentId[category.id] = category.parentId || -1;
+      idIndexValueParentId[category.id] = category.isActive
+        ? category.parentId || -1
+        : null;
     });
     idIndexValueParentId[0] = null;
 

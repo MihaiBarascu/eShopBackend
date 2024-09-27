@@ -7,154 +7,147 @@ import Product from "../database/entity/Product";
 import Category from "../database/entity/Category";
 import ProductImage from "../database/entity/ProductImage";
 import uploadPicture from "../utils/uploadImage";
+import { CreateProductDto, UpdateProductDto } from "../dto/product.dto";
+import { ProductController } from "../controllers/ProductController";
 
-const get = shared.get(Product);
-const deleteById = shared.deleteById(Product);
-const getByID = shared.getByID(Product);
-const create = shared.create(Product);
-const update = shared.update(Product);
+import { CustomRequest } from "../interfaces";
 
-const createProduct = async (request: Request, response: Response) => {
-  try {
-    const productRepository = AppDataSource.getRepository(Product);
-    const categoryRepository = AppDataSource.getRepository(Category);
-    const { name, description, price, categories, stock } = request.body;
+class ProductHandler {
+  private productController: ProductController;
 
-    const product = new Product();
-    product.name = name;
-    product.description = description;
-    product.price = price;
-    product.stock = stock;
-    if (categories) {
-      const categoriesEntities = await categoryRepository.find({
-        where: categories.map((id: number) => ({ id })),
+  constructor() {
+    this.productController = new ProductController();
+  }
+
+  addCategory = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const productId = Number(req.params.productId);
+      if (!productId) {
+        return res
+          .status(400)
+          .json({ message: `Invalid or undefined productId param` });
+      }
+
+      const categoryId = Number(req.body.categoryToAdd);
+      if (!categoryId) {
+        return res
+          .status(400)
+          .json({
+            message: `Invalid or undefined cateogryToAdd field in body`,
+          });
+      }
+
+      const result = await this.productController.addCategory(
+        productId,
+        categoryId
+      );
+
+      return res.status(200).json({ result });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  createProduct = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const dto = plainToInstance(CreateProductDto, req.body);
+
+      const result = await this.productController.createProduct(dto);
+
+      res.status(201).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  updateProduct = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const productId = Number(req.params.productId);
+      if (!productId) {
+        return res
+          .status(400)
+          .json({ message: "productId param is invalid or undefined" });
+      }
+
+      const prodDto = plainToInstance(UpdateProductDto, req.body);
+      const result = await this.productController.updateProduct(
+        productId,
+        prodDto
+      );
+
+      res.status(201).json({ result });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getProductList = async (
+    req: CustomRequest,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      return res.json(
+        await this.productController.listProducts(
+          req.pagination?.offset,
+          req.pagination?.limit
+        )
+      );
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getProductById = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const productId = Number(req.params.productId);
+      if (!productId) {
+        return res
+          .status(400)
+          .json({ message: "productId param is invalid or undefined" });
+      }
+
+      return res
+        .status(200)
+        .json(await this.productController.getProductById(productId));
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  addImage = async (request, response, next) => {
+    try {
+      const productRepository = AppDataSource.getRepository(Product);
+      const id = request.params.id;
+      const product = await productRepository.findOne({
+        where: { id: Number(request.params.id) },
+        relations: ["images"],
       });
-      console.log(categoriesEntities);
-      product.categories = categoriesEntities;
-      console.log(categoriesEntities);
+      if (!product) {
+        return response
+          .status(404)
+          .json({ message: `Product with id ${id} not found` });
+      }
+
+      const productImageDetails = new ProductImage();
+
+      const details = await uploadPicture(request, `products/${id}`);
+
+      productImageDetails.name = details.name;
+      productImageDetails.size = details.fileSize;
+      productImageDetails.type = details.type;
+
+      product.images.push(productImageDetails);
+
+      const result = await productRepository.save(product);
+
+      response.status(200).json(result);
+    } catch (err) {
+      next(err);
     }
+  };
+}
 
-    const savedProduct = await productRepository.save(product);
-
-    response.status(201).json(savedProduct);
-  } catch (error) {
-    response.status(500).json({ error: (error as Error).message });
-  }
-};
-
-const updateProduct = async (request: Request, response: Response) => {
-  try {
-    const productRepository = AppDataSource.getRepository(Product);
-    const categoryRepository = AppDataSource.getRepository(Category);
-    const productToUpdate = await productRepository.findOneBy({
-      id: Number(request.params.id),
-    });
-
-    if (!productToUpdate) {
-      return response
-        .status(404)
-        .json({ message: `Product with id ${request.params.id} not found` });
-    }
-
-    const { name, description, price, stock, categories } = request.body;
-    productToUpdate.name = name ?? productToUpdate.name;
-    productToUpdate.description = description ?? productToUpdate.description;
-    productToUpdate.price = price ?? productToUpdate.price;
-    productToUpdate.stock = stock ?? productToUpdate.stock;
-
-    if (categories) {
-      const categoriesEntities = await categoryRepository.find({
-        where: categories.map((id: number) => ({ id })),
-      });
-      productToUpdate.categories = categoriesEntities;
-      console.log(categoriesEntities);
-    }
-
-    const savedProduct = await productRepository.save(productToUpdate);
-
-    response.status(201).json(savedProduct);
-  } catch (error) {
-    response.status(500).json({ error: (error as Error).message });
-  }
-};
-
-const getProducts = async (
-  request: Request,
-  response: Response,
-  next: NextFunction
-) => {
-  try {
-    const repository = AppDataSource.getRepository(Product);
-    const builder = repository.createQueryBuilder("product");
-    if (request.query.s) {
-      builder.where(`name LIKE :s`, { s: `%${request.query.s}%` });
-    }
-
-    const sort: any = request.query.sort;
-
-    if (sort) {
-      builder.orderBy(`price`, sort.toUpperCase());
-    }
-
-    const page: number = parseInt(request.query.page as any) || 1;
-    const perPage: number = parseInt(request.query.perPage as any) || 9;
-    const total = await builder.getCount();
-
-    builder.offset((page - 1) * perPage).limit(perPage);
-
-    response.json({
-      data: await builder.getMany(),
-      total,
-      page,
-      perPage,
-      totalPages: Math.ceil(total / perPage),
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-const addImage = async (request, response, next) => {
-  try {
-    const productRepository = AppDataSource.getRepository(Product);
-    const id = request.params.id;
-    const product = await productRepository.findOne({
-      where: { id: Number(request.params.id) },
-      relations: ["images"],
-    });
-    if (!product) {
-      return response
-        .status(404)
-        .json({ message: `Product with id ${id} not found` });
-    }
-
-    const productImageDetails = new ProductImage();
-
-    const details = await uploadPicture(request, `products/${id}`);
-
-    productImageDetails.name = details.name;
-    productImageDetails.size = details.fileSize;
-    productImageDetails.type = details.type;
-
-    product.images.push(productImageDetails);
-
-    const result = await productRepository.save(product);
-
-    response.status(200).json(result);
-  } catch (err) {
-    next(err);
-  }
-};
-
-export default {
-  getProducts,
-  createProduct,
-  create,
-  get,
-  getByID,
-  update,
-  deleteById,
-  updateProduct,
-  addImage,
-};
+const productHandler = new ProductHandler();
+export default productHandler;
 
