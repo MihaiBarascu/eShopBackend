@@ -1,9 +1,9 @@
-import { UserService } from "../../services/UserService";
-import { CreateUserDto, UpdateUserDto } from "../../dto/user.dto";
-import { User } from "../../database/entity/User";
-import { PaginationResponse } from "../../interfaces";
-import Order from "../../database/entity/Order";
-import { CreateUserOrderDto } from "../../dto/userOrder.dto";
+import { UserService } from "../services/UserService";
+import { CreateUserDto, UpdateUserDto } from "../dto/user.dto";
+import { User } from "../database/entity/User";
+import { PaginationResponse } from "../interfaces";
+import Order from "../database/entity/Order";
+import { CreateUserOrderDto } from "../dto/userOrder.dto";
 
 export class UserController {
   private userService: UserService;

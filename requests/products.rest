@@ -1,3 +1,42 @@
+
+POST http://localhost:3000/products
+Content-Type: application/json
+
+{
+  "name":"telefon1",
+  "price":99,
+  "stock":22,
+  "categories":[1,6],
+  "description":"helelo"
+}
+
+###############################
+POST http://localhost:3000/products/1/images
+Content-Type: application/json
+
+{
+  "imageId":2
+}
+
+
+
+
+###############################
+
+
+GET http://localhost:3000/products
+Content-Type: application/json
+
+
+###############################
+
+
+
+
+
+
+
+
 DELETE http://localhost:3000/users/11
 Content-Type: application/json
 
@@ -92,13 +131,36 @@ Content-Type: application/json
   "stock": 10
 }
 ###############################
-PUT http://localhost:3000/products/
+POST http://localhost:3000/products/
 Content-Type: application/json
 
 { 
-  "name": "Microsoft Xbox Series X",
-  "description": "Next-gen gaming console",
-  "price": 499.99,
-  "stock": 15
+  "name": "Samsung Galaxi j6",
+  "description": "Un telefon foarte bun",
+  "price": 200,
+  "stock": 15,
+  "categories": [1,6]
 }
+################################
+
+POST http://localhost:3000/products/2/categories
+Content-Type: application/json
+
+{ 
+ "categoryToAdd":5
+}
+############################
+
+
+
+
+DELETE  http://localhost:3000/products/2/categories/5
+Content-Type: application/json
+
+{ 
+ "categoryToAdd":5
+}
+
+
+
 ###############################

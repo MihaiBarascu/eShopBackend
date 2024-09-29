@@ -2,7 +2,7 @@ import { Request, Response, NextFunction, response } from "express";
 import { AppDataSource } from "../database/data-source";
 import shared from "./shared";
 import Product from "../database/entity/Product";
-import ProductImage from "../database/entity/ProductImage";
+import ProductImage from "../database/entity/Image";
 import fs from "fs";
 import path from "path";
 import uploadPicture from "../utils/uploadImage";
@@ -35,7 +35,7 @@ const createProductImage = async (
 
     const productImageDetails = new ProductImage();
     productImageDetails.description = req.body.description;
-    productImageDetails.product = product;
+  
 
     const details = await uploadPicture(req, `products/${productId}`);
 

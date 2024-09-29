@@ -1,72 +1,51 @@
-import { AppDataSource } from "../database/data-source";
-import Category from "../database/entity/Category";
-import {
-  simpleGet,
-  simpleCreate,
-  deleteById,
-  restoreById,
-  get,
-  getById,
-} from "../shared/repositoryMethods";
 import { CreateCategoryDto, UpdateCategoryDto } from "../dto/category.dto";
 import { CategoryService } from "../services/CategoryService";
 import { PaginationResponse } from "../interfaces";
+import Category from "../database/entity/Category";
 
 export class CategoryController {
   name: string;
-  categorySerives: CategoryService;
+  categoryService: CategoryService;
 
   constructor() {
     this.name = "CategoryController";
-    this.categorySerives = new CategoryService();
+    this.categoryService = new CategoryService();
   }
 
   listCategories = async (
     offset: number | undefined = undefined,
     limit: number | undefined = undefined
   ): Promise<PaginationResponse<Category>> => {
-    return await get(Category, undefined, undefined, offset, limit);
+    return await this.categoryService.listCategories(offset, limit);
   };
 
   getCatById = async (id: number): Promise<Category> => {
-    return await getById(Category, id);
+    return await this.categoryService.getCatById(id);
   };
 
-  create = async (dto: CreateCategoryDto) => await simpleCreate(Category, dto);
+  create = async (dto: CreateCategoryDto) => {
+    return await this.categoryService.create(dto);
+  };
 
   generateTree = async () => {
-    const categories = await simpleGet(Category);
-
-    return this.categorySerives.generateTree(categories);
+    const categories = await this.categoryService.listCategories();
+    return this.categoryService.generateTree(categories.data);
   };
 
   generateHtmlList = async () => {
-    const categories = await simpleGet(Category);
-    return this.categorySerives.generateHtmlTree(categories);
+    const categories = await this.categoryService.listCategories();
+    return this.categoryService.generateHtmlTree(categories.data);
   };
 
   updateCategory = async (categId: number, categDto: UpdateCategoryDto) => {
-    const categRep = AppDataSource.getRepository(Category);
-
-    const foundCateg = await categRep.findOneOrFail({ where: { id: categId } });
-
-    foundCateg.name = categDto.name || foundCateg.name;
-    foundCateg.description = categDto.description || foundCateg.description;
-    foundCateg.parentId = categDto.parentId || foundCateg.parentId;
-    foundCateg.isActive =
-      categDto.isActive !== undefined ? categDto.isActive : foundCateg.isActive;
-
-    return await categRep.save(foundCateg);
+    return await this.categoryService.updateCategory(categId, categDto);
   };
 
-  deleteCateogryById = async (categId: number) => {
-    console.log(categId);
-    return await deleteById<Category>(Category, categId);
+  deleteCategoryById = async (categId: number) => {
+    return await this.categoryService.deleteCategoryById(categId);
   };
 
-  restoreCateogryById = async (categId: number) => {
-    console.log(categId);
-    return await restoreById<Category>(Category, categId);
+  restoreCategoryById = async (categId: number) => {
+    return await this.categoryService.restoreCategoryById(categId);
   };
 }
-

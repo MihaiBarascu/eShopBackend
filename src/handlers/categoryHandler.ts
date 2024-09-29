@@ -105,7 +105,7 @@ class CategoryHandler {
       }
 
       return res.json(
-        await this.categoryController.deleteCateogryById(categoryId)
+        await this.categoryController.deleteCategoryById(categoryId)
       );
     } catch (error) {
       next(error);
@@ -115,4 +115,3 @@ class CategoryHandler {
 
 const categoryHandler = new CategoryHandler();
 export default categoryHandler;
-

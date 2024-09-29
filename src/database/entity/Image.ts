@@ -4,15 +4,15 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  ManyToOne,
+  ManyToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  JoinColumn,
+  JoinTable,
 } from "typeorm";
 import { v4 } from "uuid";
 import Product from "./Product";
 
-@Entity("product_images")
+@Entity("images")
 export default class Image {
   @PrimaryGeneratedColumn()
   id: number;
@@ -44,15 +44,17 @@ export default class Image {
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @Column({ type: "int", nullable: false })
-  productId: number;
-
-  @ManyToOne(() => Product, (product) => product.images)
-  @JoinColumn({ name: "productId" })
-  product: Product;
+  @ManyToMany(() => Product, (product: Product) => product.images)
+  @JoinTable({
+    name: "product_images",
+    joinColumn: { name: "image_id", referencedColumnName: "id" },
+    inverseJoinColumn: { name: "product_id", referencedColumnName: "id" },
+  })
+  products: Product[];
 
   @BeforeInsert()
   addUuid() {
     this.uuid = v4();
   }
 }
+

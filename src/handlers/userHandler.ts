@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { AppDataSource } from "../database/data-source";
 import shared from "./shared";
 import { User } from "../database/entity/User";
-import { UserController } from "../controllers/user/UserController";
+import { UserController } from "../controllers/UserController";
 import { CreateUserDto, UpdateUserDto } from "../dto/user.dto";
 import { CreateUserOrderDto } from "../dto/userOrder.dto";
 import { extendedRequest } from "../utils/types";

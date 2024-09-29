@@ -51,8 +51,7 @@ class AuthHandler {
         newPassword
       );
 
-      return res.status(200).json(result)
-
+      return res.status(200).json(result);
     } catch (error) {
       next(error);
     }
@@ -95,4 +94,3 @@ class AuthHandler {
 
 const authHandler = new AuthHandler();
 export default authHandler;
-

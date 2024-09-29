@@ -6,6 +6,17 @@ import productHandler from "../handlers/productHandler";
 import { fileMiddleWare } from "../middlewares/fileMiddleware";
 
 const productsRouter = Router();
+productsRouter.post("/:productId/images", productHandler.addImage);
+
+productsRouter.delete(
+  "/:productId/images/:imageId",
+  productHandler.removeImage
+);
+
+productsRouter.delete(
+  "/:productId/images/:imageId",
+  productHandler.removeImage
+);
 // // router.get("/:userId", handler.getUser);
 // // router.get("/", handler.listUsers);
 // // router.get("/:userId", handler.getUser);
@@ -20,6 +31,10 @@ productsRouter.post(
 productsRouter.get("/:productId", productHandler.getProductById);
 
 productsRouter.post("/:productId/categories", productHandler.addCategory);
+productsRouter.delete(
+  "/:productId/categories/:categoryId",
+  productHandler.removeCategory
+);
 
 productsRouter.put(
   "/:productId",

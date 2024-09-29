@@ -15,6 +15,7 @@ import refreshTokenRouter from "./routes/refresh";
 import logoutRouter from "./routes/logout";
 import morgan from "morgan";
 import registerRouter from "./routes/register";
+import imagesRouter from "./routes/images";
 
 const app: Express = express();
 
@@ -37,6 +38,7 @@ app.use("/orders", ordersRouter);
 app.use("/order-products", orderProductsRouter);
 app.use("/roles", rolesRouter);
 app.use("/permissions", permissionsRouter);
+app.use("/images", imagesRouter);
 
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: "unknown endpoint" });

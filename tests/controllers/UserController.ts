@@ -1,4 +1,4 @@
-import { UserController } from "../../src/controllers/user/UserController";
+import { UserController } from "../../src/controllers/UserController";
 import { AppDataSource } from "../../src/database/data-source";
 import { User } from "../../src/database/entity/User";
 import { Role } from "../../src/database/entity/Role";
@@ -63,4 +63,3 @@ describe("UserController", () => {
     expect(result.password).toBe(hashedPassword);
   });
 });
-
