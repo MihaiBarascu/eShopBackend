@@ -7,18 +7,20 @@ const rolesRouter = Router();
 // router.get("/:userId", handler.getUser);
 // router.get("/", handler.listUsers);
 // router.get("/:userId", handler.getUser);
-rolesRouter.get("/", roleHandler.get);
-rolesRouter.get("/:id", roleHandler.getByID);
+rolesRouter.get("/", roleHandler.getRoleList);
+rolesRouter.get("/:roleId", roleHandler.getRoleById);
+
+rolesRouter.delete(
+  "/:roleId/permissions/:permissionId",
+  roleHandler.removePermission
+);
+
+rolesRouter.post("/:roleId/permissions", roleHandler.addPermission);
+
 rolesRouter.post(
   "/",
   validateBodyMiddleware(CreateRoleDto),
   roleHandler.createRole
-);
-rolesRouter.delete("/:id", roleHandler.deleteById);
-rolesRouter.put(
-  "/:id",
-  validateBodyMiddleware(UpdateRoleDto),
-  roleHandler.updateRole
 );
 
 // router.delete("/:userId", handler.deleteUser);

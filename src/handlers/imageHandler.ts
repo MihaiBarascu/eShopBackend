@@ -12,8 +12,6 @@ class ImageHandler {
   addImage = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const headers = req.headers as IncomingHttpHeaders;
-      const location = "images";
-      const description = "";
 
       const result = await this.imageController.addImage(headers, req);
 
@@ -34,4 +32,3 @@ class ImageHandler {
 
 const imageHandler = new ImageHandler();
 export default imageHandler;
-

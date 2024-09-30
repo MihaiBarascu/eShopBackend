@@ -25,13 +25,6 @@ export class CreateRoleDto {
     message: "description must be at most 100 characters long",
   })
   description: string;
-
-  @IsOptional()
-  @IsArray({ message: "permissions must be an array" })
-  @ArrayNotEmpty({ message: "permissions must not be empty" })
-  @ArrayMinSize(1, { message: "permissions must contain at least one item" })
-  @IsNumber({}, { each: true, message: "each category must be a number" })
-  permissions?: number[];
 }
 
 export class UpdateRoleDto {
@@ -44,7 +37,7 @@ export class UpdateRoleDto {
   @MaxLength(50, {
     message: "roleName must be at most 50 characters long",
   })
-  roleName?: string;
+  name: string;
 
   @IsOptional()
   @IsString({ message: "description must be a string" })
@@ -60,4 +53,3 @@ export class UpdateRoleDto {
   @IsNumber({}, { each: true, message: "each category must be a number" })
   permissions?: number[];
 }
-

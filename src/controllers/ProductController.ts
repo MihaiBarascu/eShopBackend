@@ -20,13 +20,17 @@ export class ProductController {
     return await this.categoryService.removeCategory(prodId, categId);
   };
 
-  addImage = async(prodId:number,imageId:number)=>{
-    return await this.productService.addImage(prodId,imageId)
+  addImage = async (prodId: number, imageId: number) => {
+    return await this.productService.addImage(prodId, imageId);
+  };
+
+  addNewImage = async (productId:number, headers,filestream)=>{
+    return await this.productService.addNewImage(productId,headers,filestream)
   }
 
-  removeImage = async(prodId:number,imageId:number)=>{
-    return await this.productService.removeImage(prodId,imageId)
-  }
+  removeImage = async (prodId: number, imageId: number) => {
+    return await this.productService.removeImage(prodId, imageId);
+  };
 
   listProducts = async (
     offset: number | undefined = undefined,

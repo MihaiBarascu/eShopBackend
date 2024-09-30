@@ -61,4 +61,18 @@ export class AuthController {
   logout = async (refreshToken: string) => {
     this.authService.deleteRefreshToken(refreshToken);
   };
+
+  refresh = async (refreshToken: string): Promise<string> => {
+    this.authService.validateRefreshToken;
+
+    const foundUser = await this.authService.finUserByRefreshToken(
+      refreshToken
+    );
+    console.log(foundUser);
+
+    return this.authService.generateAccessToken(foundUser);
+  };
 }
+//produse utlizator categorii
+
+/// modific ruta de imagini

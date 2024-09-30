@@ -7,6 +7,7 @@ import { CustomRequest } from "../interfaces";
 import { ProductService } from "../services/ProductService";
 
 import { validateFields } from "../shared/utils";
+import { IncomingHttpHeaders } from "http";
 
 class ProductHandler {
   private productController: ProductController;
@@ -140,18 +141,41 @@ class ProductHandler {
 
   addImage = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      validateFields(req, {
-        params: { productId: "productId" },
-        body: { imageId: "imageId" },
-      });
+      console.log(req.body.imageId);
 
       const productId = Number(req.params.productId);
+      const imageId =
+        req.body.imageId !== undefined ? Number(req.body.imageId) : undefined;
+      const headers = req.headers as IncomingHttpHeaders;
+      console.log(imageId);
+      if (isNaN(productId)) {
+        return res.status(400).json({ error: "Invalid product ID" });
+      }
 
-      const imageId = Number(req.body.imageId);
-
-      return res.json(
-        await this.productController.addImage(productId, imageId)
+      const isMultipart = headers["content-type"]?.includes(
+        "multipart/form-data"
       );
+      console.log(isMultipart);
+      if (imageId === undefined && isMultipart) {
+        const newImage = await this.productController.addNewImage(
+          productId,
+          headers,
+          req
+        );
+        return res.status(200).json(newImage);
+      }
+
+      if (imageId === undefined || isNaN(imageId)) {
+        return res
+          .status(400)
+          .json({ error: "Invalid image ID or image header is missing" });
+      }
+
+      const updatedProduct = await this.productController.addImage(
+        productId,
+        imageId
+      );
+      return res.json(updatedProduct);
     } catch (error) {
       next(error);
     }
@@ -178,38 +202,6 @@ class ProductHandler {
       next(error);
     }
   };
-
-  // addImage = async (request, response, next) => {
-  //   try {
-  //     const productRepository = AppDataSource.getRepository(Product);
-  //     const id = request.params.id;
-  //     const product = await productRepository.findOne({
-  //       where: { id: Number(request.params.id) },
-  //       relations: ["images"],
-  //     });
-  //     if (!product) {
-  //       return response
-  //         .status(404)
-  //         .json({ message: `Product with id ${id} not found` });
-  //     }
-
-  //     const productImageDetails = new ProductImage();
-
-  //     const details = await uploadPicture(request, `products/${id}`);
-
-  //     productImageDetails.name = details.name;
-  //     productImageDetails.size = details.fileSize;
-  //     productImageDetails.type = details.type;
-
-  //     product.images.push(productImageDetails);
-
-  //     const result = await productRepository.save(product);
-
-  //     response.status(200).json(result);
-  //   } catch (err) {
-  //     next(err);
-  //   }
-  // };
 }
 
 const productHandler = new ProductHandler();

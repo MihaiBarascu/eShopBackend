@@ -42,7 +42,7 @@ export class AuthService {
   };
 
   generateAccessToken = (user: User): string => {
-    const roleIds: number[] = user?.roles.map((role) => role.id);
+    const roleIds: number[] = user?.roles?.map((role) => role.id);
     const uniqueRoleIds = [...new Set(roleIds)];
 
     return jwt.sign(

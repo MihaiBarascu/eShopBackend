@@ -1,85 +1,125 @@
 import { Request, Response, NextFunction } from "express";
 import { plainToInstance } from "class-transformer";
-import { AppDataSource } from "../database/data-source";
-import shared from "./shared";
-import { Role } from "../database/entity/Role";
-import { Permission } from "../database/entity/Permission";
-import { In } from "typeorm";
+import { CreateRoleDto, UpdateRoleDto } from "../dto/role.dto";
+import { RoleController } from "../controllers/RoleController";
 
-const get = shared.get(Role);
-const deleteById = shared.deleteById(Role);
-const getByID = shared.getByID(Role);
-const create = shared.create(Role);
-const update = shared.update(Role);
+import { CustomRequest } from "../interfaces";
+import { RoleService } from "../services/RoleService";
 
-const createRole = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const roleRepository = AppDataSource.getRepository(Role);
+import { validateFields } from "../shared/utils";
 
-    const permissionRepository = AppDataSource.getRepository(Permission);
+class RoleHandler {
+  private roleController: RoleController;
+  private roleService: RoleService;
 
-    const role = req.body;
+  constructor() {
+    this.roleController = new RoleController();
+    this.roleService = new RoleService();
+  }
 
-    if (role.permissions) {
-      const permissions = await permissionRepository.findBy({
-        id: In(role.permissions),
-      });
+  createRole = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const dto = plainToInstance(CreateRoleDto, req.body);
 
-      if (permissions.length !== req.body.permissions.length) {
-        return res.status(400).send("Invalid permissions");
+      const result = await this.roleController.create(dto);
+
+      res.status(201).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  updateRole = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const roleId = Number(req.params.roleId);
+      if (!roleId) {
+        return res
+          .status(400)
+          .json({ message: "roleId param is invalid or undefined" });
       }
 
-      role.permissions = permissions;
+      const roleDto = plainToInstance(UpdateRoleDto, req.body);
+      const result = await this.roleController.updateRole(roleId, roleDto);
+
+      res.status(200).json({ result });
+    } catch (error) {
+      next(error);
     }
-    const result = await roleRepository.save(plainToInstance(Role, role));
+  };
 
-    return res.status(201).json(result);
-  } catch (error) {
-    next(error);
-  }
-};
-
-const updateRole = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const roleRepository = AppDataSource.getRepository(Role);
-
-    const permissionRepository = AppDataSource.getRepository(Permission);
-
-    const role = await roleRepository.findOneBy({ id: Number(req.params.id) });
-
-    if (!role) {
-      return res.status(404).send(`Role with id ${req.params.id} not found`);
+  getRoleList = async (
+    req: CustomRequest,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      return res.json(
+        await this.roleController.listRoles(
+          req.pagination?.offset,
+          req.pagination?.limit
+        )
+      );
+    } catch (error) {
+      next(error);
     }
+  };
 
-    const { name, permissions, description } = req.body;
+  getRoleById = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const roleId = Number(req.params.roleId);
+      if (!roleId) {
+        return res
+          .status(400)
+          .json({ message: "roleId param is invalid or undefined" });
+      }
 
-    const foundPermissions = await permissionRepository.findBy({
-      id: In(permissions),
-    });
-
-    if (foundPermissions.length !== permissions.length) {
-      return res.status(400).send("Invalid permissions");
+      return res
+        .status(200)
+        .json(await this.roleController.getRoleById(roleId));
+    } catch (error) {
+      next(error);
     }
+  };
 
-    role.permissions = foundPermissions;
-    role.name = name ?? role.name;
-    role.description = description ?? role.description;
+  addPermission = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      validateFields(req, {
+        params: { roleId: "roleId" },
+        body: { permissionId: "permissionId" },
+      });
 
-    const result = await roleRepository.save(role);
+      const roleId = Number(req.params.roleId);
+      const permissionId = Number(req.body.permissionId);
 
-    return res.status(200).json(result);
-  } catch (error) {
-    next(error);
-  }
-};
+      return res.json(
+        await this.roleController.addPermission(roleId, permissionId)
+      );
+    } catch (error) {
+      next(error);
+    }
+  };
 
-export default {
-  updateRole,
-  createRole,
-  create,
-  get,
-  getByID,
-  update,
-  deleteById,
-};
+  removePermission = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      validateFields(req, {
+        params: { roleId: "roleId", permissionId: "permissionId" },
+      });
 
+      const roleId = Number(req.params.roleId);
+      const permissionId = Number(req.params.permissionId);
+
+      return res.json(
+        await this.roleController.removePermission(roleId, permissionId)
+      );
+    } catch (error) {
+      next(error);
+    }
+  };
+}
+
+const roleHandler = new RoleHandler();
+export default roleHandler;

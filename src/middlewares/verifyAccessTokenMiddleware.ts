@@ -19,10 +19,9 @@ export default function verifyJWT(
     if (err) return response.sendStatus(403);
     request.email = (decoded as JwtPayload).UserInfo.email;
     request.roles = (decoded as JwtPayload).UserInfo.roles;
-    request.permissions = (decoded as JwtPayload).UserInfo.permissions;
     request.id = (decoded as JwtPayload).UserInfo.id;
     request.uuid = (decoded as JwtPayload).UserInfo.uuid;
-    console.log(request.email, request.roles, request.permissions, request.id);
+    console.log(request.email, request.roles, request.id);
     next();
   });
 }

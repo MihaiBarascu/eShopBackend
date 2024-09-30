@@ -41,4 +41,3 @@ export class ImageController {
     return await this.imageService.deleteImgFromDb(imageId);
   };
 }
-

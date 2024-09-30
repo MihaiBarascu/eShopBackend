@@ -11,8 +11,7 @@ import rolesRouter from "./routes/roles";
 import permissionsRouter from "./routes/permissions";
 import { pagination } from "./middlewares/paginationMiddleware";
 import cookieParser from "cookie-parser";
-import refreshTokenRouter from "./routes/refresh";
-import logoutRouter from "./routes/logout";
+
 import morgan from "morgan";
 import registerRouter from "./routes/register";
 import imagesRouter from "./routes/images";
@@ -29,8 +28,7 @@ app.use(pagination);
 
 app.use("/register", registerRouter);
 app.use("/auth", authRouter);
-app.use("/refresh", refreshTokenRouter);
-app.use("/logout", logoutRouter);
+
 app.use("/users", usersRouter);
 app.use("/products", productsRouter);
 app.use("/categories", categoriesRouter);

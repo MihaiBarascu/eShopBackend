@@ -4,7 +4,8 @@ import { validateBodyMiddleware } from "../middlewares/validationMiddleware";
 import { CreateProductDto, UpdateProductDto } from "../dto/product.dto";
 import productHandler from "../handlers/productHandler";
 import { fileMiddleWare } from "../middlewares/fileMiddleware";
-
+import verifyJWT from "../middlewares/verifyAccessTokenMiddleware";
+import { verifyRoles } from "../middlewares/verifyRolesMiddleware";
 const productsRouter = Router();
 productsRouter.post("/:productId/images", productHandler.addImage);
 

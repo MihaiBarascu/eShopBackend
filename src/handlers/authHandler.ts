@@ -90,6 +90,28 @@ class AuthHandler {
       next(err);
     }
   };
+
+  refresh = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const cookies = req.cookies;
+      if (!cookies?.jwt || cookies.jwt === "")
+        return res
+          .status(400)
+          .json({ message: "Refreh Token Cookie not foud" });
+
+      const refreshToken = cookies.jwt;
+
+      const newAuthToken = await this.authController.refresh(refreshToken);
+
+      console.log(
+        this.authController.authService.validateAccessToken(newAuthToken)
+      );
+
+      return res.status(200).json({ newAuthToken });
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 
 const authHandler = new AuthHandler();

@@ -10,3 +10,13 @@ Content-Type: application/json
   "name": "Pantofi Sport",
   "parentId": 13
 }
+
+#############################################
+POST http://localhost:3000/categories/
+Content-Type: application/json
+
+{
+  "name": "Protein Powder",
+  "parentId": 25
+}
+

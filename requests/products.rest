@@ -10,6 +10,46 @@ Content-Type: application/json
   "description":"helelo"
 }
 
+#######################################
+
+
+POST http://localhost:3000/products
+Content-Type: application/json
+
+{
+  "name":"Optim Nutrition Whey Gold",
+  "price":99,
+  "stock":22,
+  "description":"Hig quality whey protein"
+}
+
+####################################
+POST http://localhost:3000/products/38/categories
+Content-Type: application/json
+
+{
+"categoryToAdd":36
+}
+
+####################################
+POST http://localhost:3000/products/38/images
+Content-Type: application/json
+
+{
+"imageId":1
+}
+###############################
+
+
+DELETE http://localhost:3000/products/38/images/1
+Content-Type: application/json
+
+
+
+
+
+
+
 ###############################
 POST http://localhost:3000/products/1/images
 Content-Type: application/json

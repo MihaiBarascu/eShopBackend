@@ -11,10 +11,12 @@ const authRouter = Router();
 // router.get("/:userId", handler.getUser);
 // categoriesRouter.get("/", categoryHandler.get);
 // categoriesRouter.get("/:id", categoryHandler.getByID);
+
 authRouter.post("/login", validateBodyMiddleware(AuthDto), authHandler.login);
 authRouter.get("/logout", authHandler.logout);
 authRouter.post("/forgot-password", authHandler.forgotPassword);
 authRouter.post("/reset-password", authHandler.resetPassword);
+authRouter.get("/refresh", authHandler.refresh);
 // categoriesRouter.delete("/:id", categoryHandler.deleteById);
 // categoriesRouter.put(
 //   "/:id",

@@ -23,10 +23,12 @@ export class CreateOrderDto {
   })
   description: string;
 
+  @IsOptional()
   @IsString({ message: "type must be a string" })
   @MaxLength(100, { message: "type must be at most 100 characters long" })
   type: string;
 
+  @IsOptional()
   @IsString({ message: "status must be a string" })
   @MaxLength(100, { message: "status must be at most 100 characters long" })
   status: string;
@@ -61,3 +63,4 @@ export class UpdateOrderDto {
   @MaxLength(100, { message: "status must be at most 100 characters long" })
   status?: string;
 }
+

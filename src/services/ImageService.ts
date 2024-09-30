@@ -157,7 +157,7 @@ class ImageService {
   async addImage(
     headers: IncomingHttpHeaders,
     fileStream: NodeJS.ReadableStream,
-    location: string,
+    location: string = "images",
     description: string = ""
   ): Promise<Image> {
     const newImage = new Image();
@@ -197,4 +197,3 @@ class ImageService {
 }
 
 export default ImageService;
-

@@ -8,7 +8,7 @@ import {
 } from "class-validator";
 
 export class CreateOrderProductsDto {
-  @IsNotEmpty({ message: "orderId is required" })
+  @IsOptional()
   @IsNumber({}, { message: "orderId must be a number" })
   orderId: number;
 
