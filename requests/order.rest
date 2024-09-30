@@ -23,6 +23,37 @@ Content-Type: application/json
 
 ###
 
+POST http://localhost:3000/orders/9/products
+Content-Type: application/json
+
+{
+  "orderProducts":[
+    {
+      "productId":1,
+      "quantity":3
+    }
+  ]
+}
+####
+DELETE http://localhost:3000/orders/9/products/1
+Content-Type: application/json
+
+{
+  "orderProducts":[
+    {
+      "productId":1,
+      "quantity":3
+    }
+  ]
+}
+
+
+
+
+
+
+###
+
 ### Update an existing order
 PUT http://localhost:3000/orders/2
 Content-Type: application/json

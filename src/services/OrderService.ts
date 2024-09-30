@@ -184,11 +184,10 @@ export class OrderService {
     await this.productRepository.save(product);
 
     order.orderProducts = order.orderProducts.filter(
-      (op) => op.productId !== productId || op.productId !== undefined
+      (op) => op.productId !== productId && op.productId !== undefined
     );
 
     console.log(order);
     return await this.orderRepository.save(order);
   }
 }
-
