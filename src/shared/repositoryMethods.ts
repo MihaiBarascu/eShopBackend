@@ -1,9 +1,11 @@
 import { AppDataSource } from "../database/data-source";
+import { NotFoundError } from "../errors/NotFoundError";
 import {
   EntityTarget,
   FindOptionsWhere,
   FindOptionsRelations,
   DeepPartial,
+  DeleteResult,
 } from "typeorm";
 
 import { PaginationResponse } from "../interfaces";
@@ -13,8 +15,14 @@ export const getById = async <T extends object>(
   id: number
 ): Promise<T> => {
   const repository = AppDataSource.getRepository(type);
-  const entity = await repository.findOneOrFail({ where: { id } as any });
-  return entity;
+  try {
+    const entity = await repository.findOneOrFail({ where: { id } as any });
+    return entity;
+  } catch (error) {
+    throw new NotFoundError(
+      `Entity of type ${type.constructor.name} with id ${id} not found`
+    );
+  }
 };
 
 export const simpleGet = async <T extends object>(
@@ -37,12 +45,16 @@ export const simpleCreate = async <T extends object>(
 export const deleteById = async <T extends object>(
   type: EntityTarget<T>,
   id: number
-): Promise<void> => {
+): Promise<DeleteResult> => {
   const repository = AppDataSource.getRepository(type);
 
-  await repository.findOneOrFail({ where: { id } as any });
+  try {
+    await repository.findOneOrFail({ where: { id } as any });
+  } catch (error) {
+    throw new NotFoundError(`Product with id ${id} not found`);
+  }
 
-  await repository.softDelete(id);
+  return repository.softDelete(id);
 };
 export const restoreById = async <T extends { id: number }>(
   type: EntityTarget<T>,
@@ -85,7 +97,7 @@ export const get = async <T extends object>(
   });
 
   if (values.length == 0) {
-    throw new Error("No entities found");
+    throw new NotFoundError("No entities found");
   }
 
   return {

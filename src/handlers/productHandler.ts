@@ -99,7 +99,24 @@ class ProductHandler {
         prodDto
       );
 
-      res.status(201).json({ result });
+      res.status(200).json({ result });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  deleteProduct = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const productId = Number(req.params.productId);
+      if (!productId) {
+        return res
+          .status(400)
+          .json({ message: "productId param is invalid or undefined" });
+      }
+
+      res
+        .status(204)
+        .json(await this.productController.deleteProduct(productId));
     } catch (error) {
       next(error);
     }
@@ -195,9 +212,9 @@ class ProductHandler {
           .status(400)
           .json({ message: "imageId param is invalid or undefined" });
       }
-      return res.json(
-        await this.productController.removeImage(productId, imageId)
-      );
+      return res
+        .status(204)
+        .json(await this.productController.removeImage(productId, imageId));
     } catch (error) {
       next(error);
     }

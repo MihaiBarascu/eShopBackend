@@ -46,7 +46,7 @@ productsRouter.put(
 // );
 // productsRouter.post("/:id/images", fileMiddleWare, productHandler.addImage);
 
-// productsRouter.delete("/:id", productHandler.deleteById);
+productsRouter.delete("/:productId", productHandler.deleteProduct);
 // productsRouter.put(
 //   "/:id",
 //   validateBodyMiddleware(UpdateProductDto),

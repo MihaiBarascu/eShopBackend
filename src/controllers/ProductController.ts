@@ -13,6 +13,10 @@ export class ProductController {
     this.categoryService = new CategoryService();
   }
 
+  deleteProduct = async (prodId: number) => {
+    return await this.productService.deleteProduct(prodId);
+  };
+
   addCategory = async (prodId: number, categId: number) => {
     return await this.categoryService.addCategory(prodId, categId);
   };
@@ -24,9 +28,13 @@ export class ProductController {
     return await this.productService.addImage(prodId, imageId);
   };
 
-  addNewImage = async (productId:number, headers,filestream)=>{
-    return await this.productService.addNewImage(productId,headers,filestream)
-  }
+  addNewImage = async (productId: number, headers, filestream) => {
+    return await this.productService.addNewImage(
+      productId,
+      headers,
+      filestream
+    );
+  };
 
   removeImage = async (prodId: number, imageId: number) => {
     return await this.productService.removeImage(prodId, imageId);

@@ -3,7 +3,7 @@ import Product from "../database/entity/Product";
 import { AppDataSource } from "../database/data-source";
 import Category from "../database/entity/Category";
 import { PaginationResponse } from "../interfaces";
-import { get, getById } from "../shared/repositoryMethods";
+import { deleteById, get, getById } from "../shared/repositoryMethods";
 import ImageService from "./ImageService";
 import { Request } from "express";
 import path from "path";
@@ -53,6 +53,10 @@ export class ProductService {
     }
 
     return await AppDataSource.getRepository(Product).save(newProduct);
+  }
+
+  async deleteProduct(productId: number) {
+    return await deleteById(Product, productId);
   }
 
   async updateProduct(productId: number, productDto: UpdateProductDto) {

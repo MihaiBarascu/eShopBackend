@@ -32,11 +32,16 @@ describe("Product Routes", () => {
   });
 
   describe("GET /products", () => {
-    it("should return a list of products and 200 status", async () => {
+    it("should return a paginated list of products and 200 status", async () => {
       const response = await supertest(app).get("/products");
 
       expect(response.statusCode).toBe(200);
-      expect(Array.isArray(response.body)).toBe(true);
+      expect(response.body.meta).toHaveProperty("limit");
+      expect(response.body.meta).toHaveProperty("offset");
+      expect(response.body.meta).toHaveProperty("total");
+      expect(response.body.meta).toHaveProperty("pages");
+
+      expect(Array.isArray(response.body.data)).toBe(true);
     });
   });
 
@@ -73,21 +78,23 @@ describe("Product Routes", () => {
 
   describe("PUT /products/:productId", () => {
     it("should update a product and return 200 status", async () => {
-      const productId = 1; // Folosește un ID existent
+      const productId = 1;
       const updatedProduct = { name: "Updated Product", price: 150 };
 
       const response = await supertest(app)
         .put(`/products/${productId}`)
         .send(updatedProduct);
 
+      console.log("AICI", response.body);
+
       expect(response.statusCode).toBe(200);
-      expect(response.body.name).toBe(updatedProduct.name);
+      expect(response.body.result.name).toBe(updatedProduct.name);
     });
   });
 
   describe("DELETE /products/:productId", () => {
     it("should delete a product and return 204 status", async () => {
-      const productId = 1; // Folosește un ID existent
+      const productId = 1;
 
       const response = await supertest(app).delete(`/products/${productId}`);
 
@@ -114,6 +121,7 @@ describe("Product Routes", () => {
 
       expect(response.statusCode).toBe(201);
       expect(response.body).toHaveProperty("id");
+      ``;
     });
   });
 
@@ -130,4 +138,3 @@ describe("Product Routes", () => {
     });
   });
 });
-
