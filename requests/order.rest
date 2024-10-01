@@ -67,5 +67,4 @@ Content-Type: application/json
 ###
 
 ### Delete an order
-DELETE http://localhost:3000/orders/4
-Content-Type: application/json
+DELETE http://localhost:3000/orders/26

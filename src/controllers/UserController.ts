@@ -4,6 +4,7 @@ import { User } from "../database/entity/User";
 import { PaginationResponse } from "../interfaces";
 import Order from "../database/entity/Order";
 import { CreateUserOrderDto } from "../dto/userOrder.dto";
+import SanitizedOrder from "../serializers/order";
 
 export class UserController {
   private userService: UserService;
@@ -68,6 +69,14 @@ export class UserController {
     limit: number | undefined = undefined
   ): Promise<PaginationResponse<Order>> => {
     return await this.userService.listOrders(uuid, offset, limit);
+  };
+
+  listOrdersSanitized = async (
+    uuid: string,
+    offset: number | undefined = undefined,
+    limit: number | undefined = undefined
+  ): Promise<PaginationResponse<SanitizedOrder>> => {
+    return await this.userService.listOrdersSanitized(uuid, offset, limit);
   };
 
   getOrder = async (userId: number, orderId: number): Promise<Order> => {

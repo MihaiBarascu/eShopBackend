@@ -3,6 +3,8 @@ import { plainToInstance } from "class-transformer";
 import { CreateOrderDto, UpdateOrderDto } from "../dto/order.dto";
 import { OrderController } from "../controllers/OrderController";
 import { validateFields } from "../shared/utils";
+import SanitizedOrder from "../serializers/order";
+
 class OrderHandler {
   private orderController: OrderController;
 
@@ -33,7 +35,9 @@ class OrderHandler {
 
       const result = await this.orderController.getOrder(orderId);
 
-      res.status(200).json(result);
+      const sanitizedOrder = plainToInstance(SanitizedOrder, result);
+
+      res.status(200).json(sanitizedOrder);
     } catch (error) {
       next(error);
     }

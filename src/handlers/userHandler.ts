@@ -179,7 +179,9 @@ class UserHandler {
 
       return res
         .status(200)
-        .json(await this.userController.listOrders(uuid, offset, limit));
+        .json(
+          await this.userController.listOrdersSanitized(uuid, offset, limit)
+        );
     } catch (error) {
       next(error);
     }

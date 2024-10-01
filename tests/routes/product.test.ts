@@ -1,0 +1,133 @@
+import supertest from "supertest";
+import app from "../../src/app";
+
+jest.mock("../../src/database/data-source", () => ({
+  AppDataSource: require("../mocks/data-source").AppDataSource,
+}));
+
+describe("Product Routes", () => {
+  describe("POST /products", () => {
+    it("should create a new product and return 201", async () => {
+      const newProduct = { name: "New Product", price: 100 };
+
+      const response = await supertest(app)
+        .post("/products")
+        .set("Content-Type", "application/json")
+        .send(newProduct);
+
+      expect(response.statusCode).toBe(201);
+      expect(response.body).toHaveProperty("id");
+      expect(response.body.name).toBe(newProduct.name);
+    });
+
+    it("should return a 400 error if the body is invalid", async () => {
+      const invalidProduct = { name: "" }; // Sau altceva invalid
+
+      const response = await supertest(app)
+        .post("/products")
+        .send(invalidProduct);
+
+      expect(response.statusCode).toBe(400);
+    });
+  });
+
+  describe("GET /products", () => {
+    it("should return a list of products and 200 status", async () => {
+      const response = await supertest(app).get("/products");
+
+      expect(response.statusCode).toBe(200);
+      expect(Array.isArray(response.body)).toBe(true);
+    });
+  });
+
+  describe("GET /products/:productId", () => {
+    describe("given the product id is not a number", () => {
+      it("should return a 400", async () => {
+        const productId = "sdadas";
+
+        await supertest(app).get(`/products/${productId}`).expect(400);
+      });
+    });
+
+    describe("given the product does not exist", () => {
+      it("should return a 404", async () => {
+        const productId = 99999;
+
+        await supertest(app).get(`/products/${productId}`).expect(404);
+      });
+    });
+
+    describe("given the product does exist", () => {
+      it("should return a 200 status and the product", async () => {
+        const productId = 1;
+
+        const { body, statusCode } = await supertest(app).get(
+          `/products/${productId}`
+        );
+
+        expect(statusCode).toBe(200);
+        expect(body.id).toBe(productId);
+      });
+    });
+  });
+
+  describe("PUT /products/:productId", () => {
+    it("should update a product and return 200 status", async () => {
+      const productId = 1; // Folosește un ID existent
+      const updatedProduct = { name: "Updated Product", price: 150 };
+
+      const response = await supertest(app)
+        .put(`/products/${productId}`)
+        .send(updatedProduct);
+
+      expect(response.statusCode).toBe(200);
+      expect(response.body.name).toBe(updatedProduct.name);
+    });
+  });
+
+  describe("DELETE /products/:productId", () => {
+    it("should delete a product and return 204 status", async () => {
+      const productId = 1; // Folosește un ID existent
+
+      const response = await supertest(app).delete(`/products/${productId}`);
+
+      expect(response.statusCode).toBe(204);
+    });
+
+    it("should return 404 if product does not exist", async () => {
+      const productId = 99999; // ID inexistent
+
+      const response = await supertest(app).delete(`/products/${productId}`);
+
+      expect(response.statusCode).toBe(404);
+    });
+  });
+
+  describe("POST /products/:productId/images", () => {
+    it("should add an image to a product and return 201", async () => {
+      const productId = 1;
+      const imageData = { imageUrl: "http://example.com/image.jpg" };
+
+      const response = await supertest(app)
+        .post(`/products/${productId}/images`)
+        .send(imageData);
+
+      expect(response.statusCode).toBe(201);
+      expect(response.body).toHaveProperty("id");
+    });
+  });
+
+  describe("DELETE /products/:productId/images/:imageId", () => {
+    it("should remove an image from a product and return 204", async () => {
+      const productId = 1;
+      const imageId = 1;
+
+      const response = await supertest(app).delete(
+        `/products/${productId}/images/${imageId}`
+      );
+
+      expect(response.statusCode).toBe(204);
+    });
+  });
+});
+

@@ -7,16 +7,20 @@ import { get, deleteById, deleteByCriteria } from "../shared/repositoryMethods";
 import { PaginationResponse } from "../interfaces";
 import Order from "../database/entity/Order";
 import { transactionContext } from "../database/transactionContext";
-import {
-  aggregateOrderProducts,
-  validateAndPrepareProducts,
-  createNewOrder,
-} from "../services/userOrderService";
-import Product from "../database/entity/Product";
 
+import Product from "../database/entity/Product";
+import { UserOrderService } from "./UserOrderSerive";
 import { CreateUserOrderDto } from "../dto/userOrder.dto";
+import SanitizedOrder from "../serializers/order";
+import { plainToInstance } from "class-transformer";
 
 export class UserService {
+  userOrderService: UserOrderService;
+
+  constructor() {
+    this.userOrderService = new UserOrderService();
+  }
+
   async createUser(usr: CreateUserDto): Promise<User> {
     const user = new User();
     user.firstName = usr.firstName;
@@ -133,6 +137,29 @@ export class UserService {
     );
   }
 
+  async listOrdersSanitized(
+    uuid: string,
+    offset: number | undefined = undefined,
+    limit: number | undefined = undefined
+  ): Promise<PaginationResponse<SanitizedOrder>> {
+    const orders: PaginationResponse<Order> = await this.listOrders(
+      uuid,
+      offset,
+      limit
+    );
+
+    const sanitizedOrdersData = orders.data.map((order) =>
+      plainToInstance(SanitizedOrder, order)
+    );
+
+    const sanitizedOrders: PaginationResponse<SanitizedOrder> = {
+      data: sanitizedOrdersData,
+      meta: orders.meta,
+    };
+
+    return sanitizedOrders;
+  }
+
   async getOrder(userId: number, orderId: number): Promise<Order> {
     return (await get<Order>(Order, { id: orderId, userId })).data[0];
   }
@@ -146,7 +173,8 @@ export class UserService {
       const productRepository = transactionManager.getRepository(Product);
 
       let { orderProducts } = ordr;
-      orderProducts = aggregateOrderProducts(orderProducts);
+      orderProducts =
+        this.userOrderService.aggregateOrderProducts(orderProducts);
 
       if (!orderProducts || !orderProducts.length) {
         throw new Error("No products added to order");
@@ -158,11 +186,15 @@ export class UserService {
       }
 
       const { productsToUpdate, orderProductsToSave } =
-        await validateAndPrepareProducts(productRepository, orderProducts);
+        await this.userOrderService.validateAndPrepareProducts(
+          productRepository,
+          orderProducts
+        );
 
       await productRepository.save(productsToUpdate);
 
-      const newOrder = createNewOrder(orderProductsToSave);
+      const newOrder =
+        this.userOrderService.createNewOrder(orderProductsToSave);
 
       foundUser.orders.push(newOrder);
 
