@@ -19,7 +19,7 @@ const repository = {
     if (id === 99999) {
       throw new Error("Entity not found");
     }
-    return { affected: 1 }; // Simulează răspunsul pentru o ștergere reușită
+    return { affected: 1 };
   }),
 };
 

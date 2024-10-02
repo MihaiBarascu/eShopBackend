@@ -1,9 +1,18 @@
 import supertest from "supertest";
 import app from "../../src/app";
-
+import ImageService from "../../src/services/ImageService";
+import path from "path";
 jest.mock("../../src/database/data-source", () => ({
   AppDataSource: require("../mocks/data-source").AppDataSource,
 }));
+
+jest.spyOn(ImageService.prototype, "uploadPicture").mockImplementation(() =>
+  Promise.resolve({
+    fileSize: 1000,
+    type: "image/jpeg",
+    name: "test-image.jpg",
+  })
+);
 
 describe("Product Routes", () => {
   describe("POST /products", () => {
@@ -85,8 +94,6 @@ describe("Product Routes", () => {
         .put(`/products/${productId}`)
         .send(updatedProduct);
 
-      console.log("AICI", response.body);
-
       expect(response.statusCode).toBe(200);
       expect(response.body.result.name).toBe(updatedProduct.name);
     });
@@ -111,17 +118,36 @@ describe("Product Routes", () => {
   });
 
   describe("POST /products/:productId/images", () => {
-    it("should add an image to a product and return 201", async () => {
-      const productId = 1;
-      const imageData = { imageUrl: "http://example.com/image.jpg" };
+    describe("given an image file", () => {
+      it("should add an image to a product and return 201", async () => {
+        const productId = 1;
+        const imagePath = path.join(__dirname, "../test-files/test-image.jpg");
 
-      const response = await supertest(app)
-        .post(`/products/${productId}/images`)
-        .send(imageData);
+        const response = await supertest(app)
+          .post(`/products/${productId}/images`)
+          .set("Content-Type", "multipart/form-data")
+          .attach("image", imagePath);
 
-      expect(response.statusCode).toBe(201);
-      expect(response.body).toHaveProperty("id");
-      ``;
+        expect(response.statusCode).toBe(201);
+        expect(response.body).toHaveProperty("id");
+      });
+    });
+
+    describe("given an existing image ID", () => {
+      it("should link the existing image to the product and return 200", async () => {
+        const productId = 1;
+        const imageId = 1;
+        const imageData = { imageId };
+
+        const response = await supertest(app)
+          .post(`/products/${productId}/images`)
+          .set("Content-Type", "application/json")
+          .send(imageData);
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty("id");
+        expect(response.body.id).toBe(imageId);
+      });
     });
   });
 

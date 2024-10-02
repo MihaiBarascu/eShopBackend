@@ -179,7 +179,7 @@ class ProductHandler {
           headers,
           req
         );
-        return res.status(200).json(newImage);
+        return res.status(201).json(newImage);
       }
 
       if (imageId === undefined || isNaN(imageId)) {
@@ -192,7 +192,7 @@ class ProductHandler {
         productId,
         imageId
       );
-      return res.json(updatedProduct);
+      return res.status(200).json(updatedProduct);
     } catch (error) {
       next(error);
     }
