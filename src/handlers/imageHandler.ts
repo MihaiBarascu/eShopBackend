@@ -20,14 +20,6 @@ class ImageHandler {
       next(error);
     }
   };
-
-  deleteImage = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      res.status(201).json(this.imageController.deleteImageFromMemory(1));
-    } catch (error) {
-      next(error);
-    }
-  };
 }
 
 const imageHandler = new ImageHandler();

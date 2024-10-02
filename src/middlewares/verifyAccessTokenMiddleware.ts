@@ -13,7 +13,11 @@ export default function verifyJWT(
 
   const authHeader =
     request.headers.authorization || request.headers.authorization;
-  if (!authHeader?.startsWith("Bearer ")) return response.sendStatus(401);
+  if (!authHeader?.startsWith("Bearer ")) {
+    return response
+      .status(401)
+      .json({ error: "Missing or invalid authorization header" });
+  }
   const token = authHeader.split(" ")[1];
   jwt.verify(token, ACCESS_TOKEN_SECRET, (err, decoded) => {
     if (err) return response.sendStatus(403);

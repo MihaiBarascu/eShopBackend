@@ -19,7 +19,7 @@ export class Role {
   id: number;
 
   @Column("uuid")
-  uudi: string;
+  uuid: string;
 
   @Column({ length: 100, nullable: false })
   name: string;
@@ -35,7 +35,7 @@ export class Role {
 
   @BeforeInsert()
   generateUuid() {
-    this.uudi = generateUuid();
+    this.uuid = generateUuid();
   }
 
   @ManyToMany(() => User, (user: User) => user.roles)
@@ -49,4 +49,3 @@ export class Role {
   })
   permissions: Permission[];
 }
-

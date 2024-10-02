@@ -4,7 +4,7 @@ import { extendedRequest } from "../utils/types";
 export const verifyRoles = (...allowedRoles: number[]) => {
   return (req: extendedRequest, res: Response, next: NextFunction) => {
     if (!req?.roles) {
-      return res.sendStatus(401);
+      return res.sendStatus(403);
     }
     const rolesArray: number[] = [...allowedRoles];
     console.log(rolesArray);
@@ -13,9 +13,8 @@ export const verifyRoles = (...allowedRoles: number[]) => {
       .map((role) => rolesArray.includes(Number(role)))
       .find((val) => val === true);
     if (!result) {
-      return res.sendStatus(401);
+      return res.sendStatus(403);
     }
     next();
   };
 };
-
