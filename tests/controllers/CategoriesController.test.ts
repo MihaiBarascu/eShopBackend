@@ -160,15 +160,24 @@ describe("CategoryController", () => {
     });
 
     describe("delete category by id", () => {
-      describe("given category id is a number", () => {
-        describe("when id existents in the databse", () => {
-          it("should soft delete the category", async () => {
+      describe("given category id is a  number", () => {
+        describe("when id exists in the databse", () => {
+          it("should  delete the category", async () => {
             const existentId = 1;
 
             const deleteResult: DeleteResult =
-              await categoryController.deleteCategoryById(999);
+              await categoryController.deleteCategoryById(existentId);
 
             expect(deleteResult).toHaveProperty("affected", 1);
+          });
+        });
+        describe("when id doesn't exist in the database", () => {
+          it("should throw a NonExistentIdError", async () => {
+            const nonExistentId = 999;
+
+            await expect(
+              categoryController.deleteCategoryById(nonExistentId)
+            ).rejects.toThrow(NonExistentIdError);
           });
         });
       });

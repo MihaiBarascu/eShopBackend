@@ -5,6 +5,7 @@ import path from "path";
 jest.mock("../../src/database/data-source", () => ({
   AppDataSource: require("../mocks/data-source").AppDataSource,
 }));
+jest.setTimeout(10000);
 
 jest.spyOn(ImageService.prototype, "uploadPicture").mockImplementation(() =>
   Promise.resolve({

@@ -1,10 +1,11 @@
 import { plainToInstance } from "class-transformer";
 import Product from "../../src/database/entity/Product";
+import { NonExistentIdError } from "../../src/errors/NonExistentIdError";
 
 const repository = {
   findOneOrFail: jest.fn(async ({ where: { id } }) => {
     if (id === 99999) {
-      throw new Error("Entity not found");
+      throw new NonExistentIdError(`inexistetn enity for id ${id}`);
     }
     return { id } as object;
   }),

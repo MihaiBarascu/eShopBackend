@@ -8,6 +8,7 @@ import { ProductService } from "../services/ProductService";
 
 import { validateFields } from "../shared/utils";
 import { IncomingHttpHeaders } from "http";
+import { NonExistentIdError } from "../errors/NonExistentIdError";
 
 class ProductHandler {
   private productController: ProductController;
@@ -118,7 +119,11 @@ class ProductHandler {
         .status(204)
         .json(await this.productController.deleteProduct(productId));
     } catch (error) {
-      next(error);
+      if (error instanceof NonExistentIdError) {
+        return res.status(404).send({ message: error.message });
+      } else {
+        next(error);
+      }
     }
   };
 

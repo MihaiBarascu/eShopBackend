@@ -7,6 +7,7 @@ import {
   DeepPartial,
   DeleteResult,
   EntityNotFoundError,
+  UpdateResult,
 } from "typeorm";
 
 import { PaginationResponse } from "../interfaces";
@@ -47,7 +48,7 @@ export const simpleCreate = async <T extends object>(
 export const deleteById = async <T extends object>(
   type: EntityTarget<T>,
   id: number
-): Promise<DeleteResult> => {
+): Promise<UpdateResult> => {
   const repository = AppDataSource.getRepository(type);
 
   try {
@@ -58,7 +59,7 @@ export const deleteById = async <T extends object>(
       error.message.includes("not find any entity of type")
     ) {
       throw new NonExistentIdError(
-        "The specified category id does note exists"
+        `The specified ${repository.metadata.targetName} id does not exist`
       );
     }
     throw error;
