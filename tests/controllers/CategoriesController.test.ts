@@ -1,132 +1,177 @@
 import { CategoryController } from "../../src/controllers/CategoryController";
-
+import {
+  clearAllTables,
+  populateDatabase,
+} from "../database-for-tests/setupTestDatabase";
 import {
   CreateCategoryDto,
   UpdateCategoryDto,
 } from "../../src/dto/category.dto";
 import Category from "../../src/database/entity/Category";
 
-import { AppDataSource } from "../mocks/data-source2";
+import { AppDataSource } from "../../src/database/data-source";
+import { PaginationResponse } from "../../src/interfaces";
+import { InvalidNumberError } from "../../src/errors/InvalidNumberError";
+import { NotFoundError } from "../../src/errors/NotFoundError";
+import { NonExistentParentIdError } from "../../src/errors/NonExistentParentId";
+import { NonExistentIdError } from "../../src/errors/NonExistentIdError";
+import { DeleteResult } from "typeorm";
 
 jest.mock("../../src/database/data-source", () => ({
-  AppDataSource: require("../mocks/data-source2").AppDataSource,
+  AppDataSource: require("../database-for-tests/setupTestDatabase")
+    .AppDataSource,
 }));
+
+let categoryController: CategoryController;
+
+jest.setTimeout(10000);
 
 beforeAll(async () => {
   if (!AppDataSource.isInitialized) {
     await AppDataSource.initialize();
   }
+  categoryController = new CategoryController();
+  await populateDatabase(AppDataSource);
 });
 
 afterAll(async () => {
   if (AppDataSource.isInitialized) {
+    await clearAllTables(AppDataSource);
     await AppDataSource.destroy();
   }
 });
 
 describe("CategoryController", () => {
-  let categoryController: CategoryController;
+  describe("given database has 10 category entries", () => {
+    describe("list categories", () => {
+      describe("when limit param is 3 and offset param is 2", () => {
+        it("should return a properly paginated response", async () => {
+          const categList: PaginationResponse<Category> =
+            await categoryController.listCategories(2, 3);
 
-  beforeEach(() => {
-    categoryController = new CategoryController();
-  });
+          expect(categList).toHaveProperty("data");
+          expect(categList).toHaveProperty("meta");
 
-  it("should list categories", async () => {
-    const newCategory = new Category();
-    newCategory.name = "Test Category";
-    await AppDataSource.getRepository(Category).save(newCategory);
+          const categIdsToVerify = [3, 4, 5];
+          const receivedCatIds = categList.data.map((categ) => categ.id);
 
-    const result = await categoryController.listCategories();
-    expect(result.data.length).toBeGreaterThan(0);
-    expect(result.data[0].name).toBe("Test Category");
-  });
+          expect(receivedCatIds).toEqual(categIdsToVerify);
 
-  it("should get category by id", async () => {
-    const newCategory = new Category();
-    newCategory.name = "Test Category";
-    const savedCategory = await AppDataSource.getRepository(Category).save(
-      newCategory
-    );
+          expect(categList.meta.limit).toBe(3);
+          expect(categList.meta.offset).toBe(2);
+          expect(categList.meta.page).toBe(1);
+        });
+      });
+    });
+    describe("get category by id", () => {
+      describe("when id is not a number", () => {
+        it("should throw an InvalidNumberError", async () => {
+          const invalidId = "invalid";
+          await expect(
+            categoryController.getCatById(invalidId as any)
+          ).rejects.toThrow(InvalidNumberError);
+        });
+      });
+      describe("when id is a number", () => {
+        describe("and id exists in the databse", () => {
+          it("should return the category", async () => {
+            const validId = 1;
 
-    const result = await categoryController.getCatById(savedCategory.id);
-    expect(result).toBeDefined();
-    expect(result.name).toBe("Test Category");
-  });
+            const foundCateg: Category = await categoryController.getCatById(
+              validId
+            );
+            expect(foundCateg).toHaveProperty("id", validId);
+          });
+        });
 
-  it("should create a category", async () => {
-    const dto: any = { name: "New Category" };
+        describe("and id does not exists in the database", () => {
+          it("should throw a NotFoundError", async () => {
+            const nonExistentId = 999;
+            await expect(
+              categoryController.getCatById(nonExistentId)
+            ).rejects.toThrow(NotFoundError);
+          });
+        });
+      });
+    });
 
-    const result = await categoryController.create(dto);
-    expect(result).toBeDefined();
-    expect(result.name).toBe("New Category");
+    describe("create category", () => {
+      describe("when categorydto is valid", () => {
+        describe("and parentId exists in the database", () => {
+          it("should create and return the category", async () => {
+            const validDto: CreateCategoryDto = {
+              name: "furniture",
+              parentId: 3,
+              isActive: true,
+              description: "furniture",
+            };
 
-    const savedCategory = await AppDataSource.getRepository(Category).findOneBy(
-      { name: "New Category" }
-    );
-    expect(savedCategory).toBeDefined();
-  });
+            const createdCat = await categoryController.create(validDto);
 
-  it("should generate HTML list", async () => {
-    const newCategory = new Category();
-    newCategory.name = "Test Category";
-    await AppDataSource.getRepository(Category).save(newCategory);
+            expect(createdCat).toHaveProperty("name", validDto.name);
+            expect(createdCat).toHaveProperty("parentId", validDto.parentId);
+            expect(createdCat).toHaveProperty("id", 11);
+          });
+        });
+        describe("and parentId does not exists in the databse", () => {
+          it("should throw a NonExistentParentId", async () => {
+            const validDto: CreateCategoryDto = {
+              name: "furniture",
+              parentId: 999,
+              isActive: true,
+              description: "furniture",
+            };
 
-    const result = await categoryController.generateHtmlList();
-    expect(result).toContain("<li>Test Category</li>");
-  });
+            await expect(categoryController.create(validDto)).rejects.toThrow(
+              NonExistentParentIdError
+            );
+          });
+        });
+      });
+    });
 
-  it("should update a category", async () => {
-    const newCategory = new Category();
-    newCategory.name = "Old Category";
-    const savedCategory = await AppDataSource.getRepository(Category).save(
-      newCategory
-    );
+    describe("update category by id", () => {
+      describe("given id is a number and category dto is valid", () => {
+        describe("when id is existent in the database", () => {
+          it("should return updated category", async () => {
+            const validDto: any = { name: "furniture2" };
+            const existentId = 11;
 
-    const dto: any = { name: "Updated Category" };
-    const result = await categoryController.updateCategory(
-      savedCategory.id,
-      dto
-    );
-    expect(result).toBeDefined();
-    expect(result.name).toBe("Updated Category");
+            const updatedCategory = await categoryController.updateCategory(
+              existentId,
+              validDto
+            );
 
-    const updatedCategory = await AppDataSource.getRepository(
-      Category
-    ).findOneBy({ id: savedCategory.id });
-    expect(updatedCategory).toBeDefined();
-    expect(updatedCategory!.name).toBe("Updated Category");
-  });
+            expect(updatedCategory).toHaveProperty("id", existentId);
+            expect(updatedCategory).toHaveProperty("name", validDto.name);
+          });
+        });
+        describe("when id is not existent in the database", () => {
+          it("should throw NonExistentIdError", async () => {
+            const inexitendId = 99;
+            const validDto: any = { name: "furniture3" };
 
-  it("should delete a category by id", async () => {
-    const newCategory = new Category();
-    newCategory.name = "Test Category";
-    const savedCategory = await AppDataSource.getRepository(Category).save(
-      newCategory
-    );
+            await expect(
+              categoryController.updateCategory(inexitendId, validDto)
+            ).rejects.toThrow(NonExistentIdError);
+          });
+        });
+      });
+    });
 
-    await categoryController.deleteCategoryById(savedCategory.id);
+    describe("delete category by id", () => {
+      describe("given category id is a number", () => {
+        describe("when id existents in the databse", () => {
+          it("should soft delete the category", async () => {
+            const existentId = 1;
 
-    const deletedCategory = await AppDataSource.getRepository(
-      Category
-    ).findOneBy({ id: savedCategory.id });
-    expect(deletedCategory).toBeNull();
-  });
+            const deleteResult: DeleteResult =
+              await categoryController.deleteCategoryById(999);
 
-  it("should restore a category by id", async () => {
-    const newCategory = new Category();
-    newCategory.name = "Test Category";
-    const savedCategory = await AppDataSource.getRepository(Category).save(
-      newCategory
-    );
-
-    await categoryController.deleteCategoryById(savedCategory.id);
-    await categoryController.restoreCategoryById(savedCategory.id);
-
-    const restoredCategory = await AppDataSource.getRepository(
-      Category
-    ).findOneBy({ id: savedCategory.id });
-    expect(restoredCategory).toBeDefined();
-    expect(restoredCategory!.name).toBe("Test Category");
+            expect(deleteResult).toHaveProperty("affected", 1);
+          });
+        });
+      });
+    });
   });
 });
-

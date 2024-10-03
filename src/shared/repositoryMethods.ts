@@ -6,9 +6,11 @@ import {
   FindOptionsRelations,
   DeepPartial,
   DeleteResult,
+  EntityNotFoundError,
 } from "typeorm";
 
 import { PaginationResponse } from "../interfaces";
+import { NonExistentIdError } from "../errors/NonExistentIdError";
 
 export const getById = async <T extends object>(
   type: EntityTarget<T>,
@@ -51,10 +53,18 @@ export const deleteById = async <T extends object>(
   try {
     await repository.findOneOrFail({ where: { id } as any });
   } catch (error) {
-    throw new NotFoundError(`Product with id ${id} not found`);
+    if (
+      error instanceof EntityNotFoundError &&
+      error.message.includes("not find any entity of type")
+    ) {
+      throw new NonExistentIdError(
+        "The specified category id does note exists"
+      );
+    }
+    throw error;
   }
 
-  return repository.softDelete(id);
+  return await repository.softDelete(id);
 };
 export const restoreById = async <T extends { id: number }>(
   type: EntityTarget<T>,

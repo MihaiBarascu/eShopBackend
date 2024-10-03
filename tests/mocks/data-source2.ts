@@ -17,13 +17,13 @@ export const AppDataSource = new DataSource({
   dropSchema: true,
 });
 
-// AppDataSource.initialize()
-//   .then(() => {
-//     console.log("datasource initiazlied");
-//   })
-//   .catch((error) => {
-//     console.log("Error during Data Source initialization:", error);
-//   });
+AppDataSource.initialize()
+  .then(() => {
+    console.log("datasource initiazlied");
+  })
+  .catch((error) => {
+    console.log("Error during Data Source initialization:", error);
+  });
 
 export async function clearAllTables() {
   if (!AppDataSource.isInitialized) {
@@ -47,4 +47,3 @@ export async function clearAllTables() {
 }
 
 // docker-compose -f docker-compose.test.yaml up -d
-

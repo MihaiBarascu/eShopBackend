@@ -13,6 +13,12 @@ jest.spyOn(ImageService.prototype, "uploadPicture").mockImplementation(() =>
     name: "test-image.jpg",
   })
 );
+console.log(
+  "++worker productroute +++++",
+  process.env.JEST_WORKER_ID,
+  process.env.JEST_WORKERS,
+  "+++++++"
+);
 
 describe("Product Routes", () => {
   describe("POST /products (create product)", () => {

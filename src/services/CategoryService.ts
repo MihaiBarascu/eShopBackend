@@ -3,6 +3,7 @@ import { UpdateCategoryDto } from "../dto/category.dto";
 import { AppDataSource } from "../database/data-source";
 import Product from "../database/entity/Product";
 import { PaginationResponse } from "../interfaces";
+import { InvalidNumberError } from "../errors/InvalidNumberError";
 import {
   get,
   getById,
@@ -24,6 +25,9 @@ export class CategoryService {
   }
 
   async getCatById(id: number): Promise<Category> {
+    if (typeof id !== "number" || isNaN(id)) {
+      throw new InvalidNumberError("Invalid ID: ID must be a number");
+    }
     return await getById(Category, id);
   }
   async create(dto: CreateCategoryDto) {

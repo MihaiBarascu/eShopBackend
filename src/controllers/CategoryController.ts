@@ -2,6 +2,9 @@ import { CreateCategoryDto, UpdateCategoryDto } from "../dto/category.dto";
 import { CategoryService } from "../services/CategoryService";
 import { PaginationResponse } from "../interfaces";
 import Category from "../database/entity/Category";
+import { NonExistentParentIdError } from "../errors/NonExistentParentId";
+import { EntityNotFoundError, QueryFailedError } from "typeorm";
+import { NonExistentIdError } from "../errors/NonExistentIdError";
 
 export class CategoryController {
   name: string;
@@ -24,7 +27,19 @@ export class CategoryController {
   };
 
   create = async (dto: CreateCategoryDto) => {
-    return await this.categoryService.create(dto);
+    try {
+      return await this.categoryService.create(dto);
+    } catch (error) {
+      if (
+        error instanceof QueryFailedError &&
+        error.message.includes("a foreign key constraint fails")
+      ) {
+        throw new NonExistentParentIdError(
+          "Invalid parentId: The specified parentId does not exist."
+        );
+      }
+      throw error;
+    }
   };
 
   generateTree = async () => {
@@ -38,7 +53,19 @@ export class CategoryController {
   };
 
   updateCategory = async (categId: number, categDto: UpdateCategoryDto) => {
-    return await this.categoryService.updateCategory(categId, categDto);
+    try {
+      return await this.categoryService.updateCategory(categId, categDto);
+    } catch (error) {
+      if (
+        error instanceof EntityNotFoundError &&
+        error.message.includes("not find any entity of type")
+      ) {
+        throw new NonExistentIdError(
+          "The specified category id does note exists"
+        );
+      }
+      throw error;
+    }
   };
 
   deleteCategoryById = async (categId: number) => {
