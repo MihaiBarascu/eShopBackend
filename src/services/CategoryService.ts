@@ -14,6 +14,10 @@ import {
 import { CreateCategoryDto } from "../dto/category.dto";
 
 import { error as logError } from "../utils/logger";
+import { NonExistentIdError } from "../errors/NonExistentIdError";
+import findOneOrFailTreated from "../shared/treatedFindOneOrFailMethod";
+import { NotFoundError } from "../errors/NotFoundError";
+import { DuplicateMemberError } from "../errors/DuplicateMemberError";
 export class CategoryService {
   constructor() {}
 
@@ -166,33 +170,40 @@ export class CategoryService {
   }
 
   async addCategory(prodId: number, categId: number) {
-    const categRepo = AppDataSource.getRepository(Category);
+    try {
+      const categRepo = AppDataSource.getRepository(Category);
 
-    const foundCateg = await categRepo.findOneByOrFail({ id: categId });
+      const foundCateg = await findOneOrFailTreated(categRepo, categId);
 
-    const prodWithRelations: Product = (
-      await get(Product, { id: prodId }, { categories: true })
-    ).data[0];
+      const prodWithRelations: Product = (
+        await get(Product, { id: prodId }, { categories: true })
+      ).data[0];
 
-    if (!prodWithRelations) {
-      logError(
-        `error adding category to product: product with id ${prodId} not found`
+      const allreadyHaveCat = prodWithRelations.categories.findIndex(
+        (category) => category.id === foundCateg.id
       );
-      throw new Error("Product not found");
+      if (allreadyHaveCat !== -1) {
+        logError(
+          `error adding category to product: product with id ${prodId} is allready part of category with id ${categId}`
+        );
+        throw new DuplicateMemberError(
+          `product with id ${prodId} is allready part of category with id ${categId}`
+        );
+      }
+
+      prodWithRelations.categories.push(foundCateg);
+
+      return await AppDataSource.getRepository(Product).save(prodWithRelations);
+    } catch (error) {
+      if (
+        error instanceof NotFoundError &&
+        error.message.includes("No entities found")
+      ) {
+        throw new NonExistentIdError(
+          `Product with id ${prodId} doesn't exist in the database`
+        );
+      }
+      throw error;
     }
-
-    const allreadyHaveCat = prodWithRelations.categories.findIndex(
-      (category) => category.id === foundCateg.id
-    );
-    if (allreadyHaveCat !== -1) {
-      logError(
-        `error adding category to product: product with id ${prodId} is allready part of category with id ${categId}`
-      );
-      throw new Error("Duplicate Category");
-    }
-
-    prodWithRelations.categories.push(foundCateg);
-
-    return await AppDataSource.getRepository(Product).save(prodWithRelations);
   }
 }

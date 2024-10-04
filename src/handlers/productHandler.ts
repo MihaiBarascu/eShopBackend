@@ -163,7 +163,7 @@ class ProductHandler {
 
   addImage = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      console.log(req.body.imageId);
+      console.log("imageId", req.body.imageId);
 
       const productId = Number(req.params.productId);
       const imageId =
@@ -193,10 +193,11 @@ class ProductHandler {
           .json({ error: "Invalid image ID or image header is missing" });
       }
 
-      const updatedProduct = await this.productController.addImage(
-        productId,
-        imageId
-      );
+      const updatedProduct =
+        await this.productController.linkExistentImageToProduct(
+          productId,
+          imageId
+        );
       return res.status(200).json(updatedProduct);
     } catch (error) {
       next(error);
@@ -219,7 +220,12 @@ class ProductHandler {
       }
       return res
         .status(204)
-        .json(await this.productController.removeImage(productId, imageId));
+        .json(
+          await this.productController.unlinkImageFromProduct(
+            productId,
+            imageId
+          )
+        );
     } catch (error) {
       next(error);
     }

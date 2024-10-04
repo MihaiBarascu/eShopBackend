@@ -19,12 +19,17 @@ export const getById = async <T extends object>(
 ): Promise<T> => {
   const repository = AppDataSource.getRepository(type);
   try {
-    const entity = await repository.findOneOrFail({ where: { id } as any });
-    return entity;
+    return await repository.findOneOrFail({ where: { id } as any });
   } catch (error) {
-    throw new NotFoundError(
-      `Entity of type ${type.constructor.name} with id ${id} not found`
-    );
+    if (
+      error instanceof EntityNotFoundError &&
+      error.message.includes("not find any entity of type")
+    ) {
+      throw new NonExistentIdError(
+        `The specified ${repository.metadata.targetName} id does not exist`
+      );
+    }
+    throw error;
   }
 };
 
@@ -70,10 +75,22 @@ export const deleteById = async <T extends object>(
 export const restoreById = async <T extends { id: number }>(
   type: EntityTarget<T>,
   id: number
-): Promise<void> => {
+): Promise<UpdateResult> => {
   const repository = AppDataSource.getRepository(type);
-
-  await repository.restore(id);
+  try {
+    await repository.findOneOrFail({ where: { id } as any, withDeleted: true });
+  } catch (error) {
+    if (
+      error instanceof EntityNotFoundError &&
+      error.message.includes("not find any entity of type")
+    ) {
+      throw new NonExistentIdError(
+        `The specified ${repository.metadata.targetName} id does not exist`
+      );
+    }
+    throw error;
+  }
+  return await repository.restore(id);
 };
 
 export const deleteByCriteria = async <T extends object>(

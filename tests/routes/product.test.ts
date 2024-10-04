@@ -1,11 +1,16 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import supertest from "supertest";
 import app from "../../src/app";
 import ImageService from "../../src/services/ImageService";
 import path from "path";
+
+jest.setTimeout(7000);
+
 jest.mock("../../src/database/data-source", () => ({
   AppDataSource: require("../mocks/data-source").AppDataSource,
 }));
-jest.setTimeout(10000);
 
 jest.spyOn(ImageService.prototype, "uploadPicture").mockImplementation(() =>
   Promise.resolve({
@@ -13,12 +18,6 @@ jest.spyOn(ImageService.prototype, "uploadPicture").mockImplementation(() =>
     type: "image/jpeg",
     name: "test-image.jpg",
   })
-);
-console.log(
-  "++worker productroute +++++",
-  process.env.JEST_WORKER_ID,
-  process.env.JEST_WORKERS,
-  "+++++++"
 );
 
 describe("Product Routes", () => {

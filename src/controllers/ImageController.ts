@@ -24,13 +24,17 @@ export class ImageController {
       location
     );
 
-    const newImage = new Image();
-    newImage.name = pictureDetails.name;
-    newImage.size = pictureDetails.fileSize;
-    newImage.type = pictureDetails.type;
-    newImage.description = description;
+    return await this.imageService.saveImageNameInDatabase(pictureDetails);
+  };
 
-    return await AppDataSource.getRepository(Image).save(newImage);
+
+  
+
+
+
+
+  getImageDetailsFromDB = async (imageId: number) => {
+    return await this.imageService.getImageFromDB(imageId);
   };
 
   deleteImageFromMemory = async (imageId: number): Promise<void> => {
