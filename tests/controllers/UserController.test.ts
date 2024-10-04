@@ -12,12 +12,6 @@ jest.mock("../../src/database/data-source", () => ({
 }));
 jest.mock("../../src/utils/hashPassword");
 
-console.log(
-  "++worker usercontroller +++++",
-  process.env.JEST_WORKER_ID,
-  "+++++++"
-);
-
 describe("UserController", () => {
   let userController: UserController;
   let userRepository: jest.Mocked<any>;

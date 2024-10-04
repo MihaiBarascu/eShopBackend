@@ -24,6 +24,30 @@ interface PictureDetails {
 class ImageService {
   private allowedMimeTypes = ["image/jpeg", "image/png", "image/gif"];
 
+  verifyImageExtension = (filename: string) => {
+    if (
+      filename.endsWith(".png") ||
+      filename.endsWith(".jpg") ||
+      filename.endsWith(".jpeg")
+    ) {
+      return true;
+    }
+    return false;
+  };
+
+  saveImageNameInDatabase = async (pictureDetails) => {
+    const newImage = new Image();
+    newImage.name = pictureDetails.name;
+    newImage.size = pictureDetails.fileSize;
+    newImage.type = pictureDetails.type;
+
+    return await AppDataSource.getRepository(Image).save(newImage);
+  };
+
+  getImageFromDB = async (imageId: number) => {
+    return await getById(Image, imageId);
+  };
+
   async createUploadDir(location: string): Promise<string> {
     let uploadDir;
     try {
@@ -70,7 +94,9 @@ class ImageService {
         }
         fileProcessed = true;
 
-        const { filename, encoding, mimeType } = info;
+        let { filename, encoding, mimeType } = info;
+
+        filename = filename.replace(/\s+/g, "-");
 
         logInfo(
           `File [${name}] : filename : %j, encoding: %j, mimeType: %j`,

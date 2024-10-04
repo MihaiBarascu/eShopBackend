@@ -16,6 +16,9 @@ export class ProductController {
   deleteProduct = async (prodId: number) => {
     return await this.productService.deleteProduct(prodId);
   };
+  restoreProduct = async (prodId: number) => {
+    return await this.productService.restoreProduct(prodId);
+  };
 
   addCategory = async (prodId: number, categId: number) => {
     return await this.categoryService.addCategory(prodId, categId);
@@ -24,8 +27,11 @@ export class ProductController {
     return await this.categoryService.removeCategory(prodId, categId);
   };
 
-  addImage = async (prodId: number, imageId: number) => {
-    return await this.productService.addImage(prodId, imageId);
+  linkExistentImageToProduct = async (prodId: number, imageId: number) => {
+    return await this.productService.linkExistentImageToProduct(
+      prodId,
+      imageId
+    );
   };
 
   addNewImage = async (productId: number, headers, filestream) => {
@@ -36,8 +42,8 @@ export class ProductController {
     );
   };
 
-  removeImage = async (prodId: number, imageId: number) => {
-    return await this.productService.removeImage(prodId, imageId);
+  unlinkImageFromProduct = async (prodId: number, imageId: number) => {
+    return await this.productService.unlinkImageFromProduct(prodId, imageId);
   };
 
   listProducts = async (

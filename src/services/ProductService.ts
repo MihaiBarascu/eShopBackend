@@ -3,12 +3,20 @@ import Product from "../database/entity/Product";
 import { AppDataSource } from "../database/data-source";
 import Category from "../database/entity/Category";
 import { PaginationResponse } from "../interfaces";
-import { deleteById, get, getById } from "../shared/repositoryMethods";
+import {
+  deleteById,
+  get,
+  getById,
+  restoreById,
+} from "../shared/repositoryMethods";
 import ImageService from "./ImageService";
 import { Request } from "express";
 import path from "path";
 import Image from "../database/entity/Image";
 import { IncomingHttpHeaders } from "http";
+import findOneOrFailTreated from "../shared/treatedFindOneOrFailMethod";
+import { NonExistentIdError } from "../errors/NonExistentIdError";
+import { MissingMemberError } from "../errors/MissingMemberError";
 
 export class ProductService {
   imageService: ImageService;
@@ -59,12 +67,14 @@ export class ProductService {
     return await deleteById(Product, productId);
   }
 
+  async restoreProduct(productId: number) {
+    return await restoreById(Product, productId);
+  }
+
   async updateProduct(productId: number, productDto: UpdateProductDto) {
     const productRep = AppDataSource.getRepository(Product);
 
-    const foundProd = await productRep.findOneOrFail({
-      where: { id: productId },
-    });
+    const foundProd = await findOneOrFailTreated(productRep, productId);
 
     foundProd.name = productDto.name ?? foundProd.name;
     foundProd.description = productDto.description ?? foundProd.description;
@@ -82,8 +92,24 @@ export class ProductService {
     return await productRep.save(foundProd);
   }
 
-  async removeImage(productId: number, imageId: number): Promise<Product> {
+  async unlinkImageFromProduct(
+    productId: number,
+    imageId: number
+  ): Promise<Product> {
+    const imageRep = AppDataSource.getRepository(Image);
+
+    await findOneOrFailTreated(imageRep, imageId);
+
     const product = await this.getProdWithImgRel(productId);
+
+    const imageIndex = product.images.findIndex(
+      (image) => image.id === imageId
+    );
+    if (imageIndex === -1) {
+      throw new MissingMemberError(
+        `Product with id ${productId} is not linked with image with id ${imageId}`
+      );
+    }
 
     product.images = product.images.filter(
       (image) => Number(image.id) !== imageId
@@ -98,13 +124,16 @@ export class ProductService {
     ).data[0];
 
     if (!product) {
-      throw new Error(`Product with id ${productId} not found`);
+      throw new NonExistentIdError(`Product with id ${productId} not found`);
     }
 
     return product;
   }
 
-  async addImage(productId: number, imageId: number): Promise<Product> {
+  async linkExistentImageToProduct(
+    productId: number,
+    imageId: number
+  ): Promise<Product> {
     const foundProduct = await this.getProdWithImgRel(productId);
     const foundImage = await getById(Image, imageId);
     if (!foundImage) {

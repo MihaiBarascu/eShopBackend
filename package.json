@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --runInBand",
     "dev": "nodemon --legacy-watch",
     "typeorm": "typeorm-ts-node-commonjs -d src/database/data-source.ts",
     "start": "",

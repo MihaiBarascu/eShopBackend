@@ -1,4 +1,5 @@
 import { CategoryController } from "../../src/controllers/CategoryController";
+import { expectNonExistentIdError, expectError } from "../testUtils";
 import {
   clearAllTables,
   populateDatabase,
@@ -23,8 +24,6 @@ jest.mock("../../src/database/data-source", () => ({
 }));
 
 let categoryController: CategoryController;
-
-jest.setTimeout(10000);
 
 beforeAll(async () => {
   if (!AppDataSource.isInitialized) {
@@ -67,9 +66,11 @@ describe("CategoryController", () => {
       describe("when id is not a number", () => {
         it("should throw an InvalidNumberError", async () => {
           const invalidId = "invalid";
-          await expect(
-            categoryController.getCatById(invalidId as any)
-          ).rejects.toThrow(InvalidNumberError);
+
+          await expectError(
+            () => categoryController.getCatById(invalidId as any),
+            InvalidNumberError
+          );
         });
       });
       describe("when id is a number", () => {
@@ -87,9 +88,11 @@ describe("CategoryController", () => {
         describe("and id does not exists in the database", () => {
           it("should throw a NotFoundError", async () => {
             const nonExistentId = 999;
-            await expect(
-              categoryController.getCatById(nonExistentId)
-            ).rejects.toThrow(NotFoundError);
+
+            await expectError(
+              () => categoryController.getCatById(nonExistentId),
+              NonExistentIdError
+            );
           });
         });
       });
@@ -151,9 +154,10 @@ describe("CategoryController", () => {
             const inexitendId = 99;
             const validDto: any = { name: "furniture3" };
 
-            await expect(
-              categoryController.updateCategory(inexitendId, validDto)
-            ).rejects.toThrow(NonExistentIdError);
+            await expectError(
+              () => categoryController.updateCategory(inexitendId, validDto),
+              NonExistentIdError
+            );
           });
         });
       });
@@ -175,9 +179,35 @@ describe("CategoryController", () => {
           it("should throw a NonExistentIdError", async () => {
             const nonExistentId = 999;
 
-            await expect(
-              categoryController.deleteCategoryById(nonExistentId)
-            ).rejects.toThrow(NonExistentIdError);
+            await expectError(
+              () => categoryController.deleteCategoryById(nonExistentId),
+              NonExistentIdError
+            );
+          });
+        });
+      });
+    });
+
+    describe("restore deleted category by id", () => {
+      describe("given category id is a  number", () => {
+        describe("when id exists in the databse", () => {
+          it("should restore deleted  category", async () => {
+            const existentId = 1;
+
+            const deleteResult: DeleteResult =
+              await categoryController.restoreCategoryById(existentId);
+
+            expect(deleteResult).toHaveProperty("affected", 1);
+          });
+        });
+        describe("when id doesn't exist in the database", () => {
+          it("should throw a NonExistentIdError", async () => {
+            const nonExistentId = 999;
+
+            await expectError(
+              () => categoryController.restoreCategoryById(nonExistentId),
+              NonExistentIdError
+            );
           });
         });
       });

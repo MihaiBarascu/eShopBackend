@@ -1,3 +1,4 @@
+import path from "path";
 export default {
   preset: "ts-jest",
   testEnvironment: "node",
@@ -5,5 +6,6 @@ export default {
   verbose: true,
   forceExit: true,
   //cleanMOcks:true
+  setupFiles: [path.join(__dirname, "./jest.setup.ts")],
 };
 

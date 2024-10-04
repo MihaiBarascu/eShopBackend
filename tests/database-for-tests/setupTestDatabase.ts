@@ -79,6 +79,17 @@ export const populateDatabase = async (AppDataSource: DataSource) => {
   } catch (error) {
     console.error("Error inserting roles:", error);
   }
+
+  try {
+    await AppDataSource.query(`
+      INSERT INTO images (uuid, name, description, createdAt, updatedAt, size) VALUES
+      ('a45b9a1c-6a4e-4e6c-9a8f-1f098bd4d3a5', 'image1', 'TestImage', NOW(), NOW(), 112),
+      ('a45b9wew-6a4e-4e6c-9a8f-1f098bd4d3a5', 'image2', 'TestImage', NOW(), NOW(), 112)
+      
+    `);
+  } catch (error) {
+    console.error("Error inserting images:", error);
+  }
 };
 
 export async function clearAllTables(AppDataSource: DataSource) {
