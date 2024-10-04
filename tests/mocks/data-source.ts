@@ -12,7 +12,14 @@ const repository = {
   save: jest.fn(async (entity) => ({ ...entity, id: 1 })),
   find: jest.fn(async () => [{ id: 1, name: "Test Product", images: [] }]),
   findAndCount: jest.fn(async ({ where, skip, take, relations }) => {
-    const results = [{ id: 1, name: "Test Product", images: [] }];
+    const results = [
+      {
+        id: 1,
+        name: "Test Product",
+        images: [{ id: 1 }],
+        categories: [{ id: 1, name: "Test Category" }],
+      },
+    ];
     const total = results.length;
     return [results, total];
   }),

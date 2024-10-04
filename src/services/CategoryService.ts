@@ -183,9 +183,6 @@ export class CategoryService {
         (category) => category.id === foundCateg.id
       );
       if (allreadyHaveCat !== -1) {
-        logError(
-          `error adding category to product: product with id ${prodId} is allready part of category with id ${categId}`
-        );
         throw new DuplicateMemberError(
           `product with id ${prodId} is allready part of category with id ${categId}`
         );
