@@ -13,6 +13,7 @@ import {
 import { Permission } from "../database/entity/Permission";
 
 import { error as logError } from "../utils/logger";
+import findOneOrFailTreated from "../shared/treatedFindOneOrFailMethod";
 
 export class RoleService {
   constructor() {}
@@ -35,7 +36,7 @@ export class RoleService {
   async updateRole(roleId: number, roleDto: UpdateRoleDto) {
     const roleRep = AppDataSource.getRepository(Role);
 
-    const foundRole = await roleRep.findOneOrFail({ where: { id: roleId } });
+    const foundRole = await findOneOrFailTreated(roleRep, roleId);
 
     foundRole.name = roleDto.name || foundRole.name;
     foundRole.description = roleDto.description || foundRole.description;

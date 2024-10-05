@@ -13,6 +13,11 @@ import { UserOrderService } from "./UserOrderSerive";
 import { CreateUserOrderDto } from "../dto/userOrder.dto";
 import SanitizedOrder from "../serializers/order";
 import { plainToInstance } from "class-transformer";
+import { DeleteResult, EntityNotFoundError, UpdateResult } from "typeorm";
+import findOneOrFailTreated from "../shared/treatedFindOneOrFailMethod";
+import { DuplicateMemberError } from "../errors/DuplicateMemberError";
+import { NonExistentIdError } from "../errors/NonExistentIdError";
+import { MissingMemberError } from "../errors/MissingMemberError";
 
 export class UserService {
   userOrderService: UserOrderService;
@@ -20,6 +25,23 @@ export class UserService {
   constructor() {
     this.userOrderService = new UserOrderService();
   }
+
+  getUserByUuidWithRolesRel = async (uuid: string): Promise<User> => {
+    try {
+      const userRepository = AppDataSource.getRepository(User);
+      return await userRepository.findOneOrFail({
+        where: { uuid: uuid },
+        relations: { roles: true },
+      });
+    } catch (error) {
+      if (error instanceof EntityNotFoundError) {
+        throw new NonExistentIdError(
+          `User with uuid: ${uuid} doesn't exist in the database`
+        );
+      }
+      throw error;
+    }
+  };
 
   async createUser(usr: CreateUserDto): Promise<User> {
     const user = new User();
@@ -43,61 +65,58 @@ export class UserService {
 
   async getUser(userId: number): Promise<User> {
     const userRepository = AppDataSource.getRepository(User);
-    return await userRepository.findOneOrFail({
-      where: { id: userId },
-    });
+
+    return await findOneOrFailTreated(userRepository, userId);
   }
 
   async addRole(uuid: string, roleId: number): Promise<User> {
     const roleRepository = AppDataSource.getRepository(Role);
-    const role = await roleRepository.findOneOrFail({
-      where: { id: roleId },
-    });
 
-    const userRepository = AppDataSource.getRepository(User);
-    const user = await userRepository.findOneOrFail({
-      where: { uuid: uuid },
-      relations: ["roles"],
-    });
+    const role = await findOneOrFailTreated(roleRepository, roleId);
+
+    const user = await this.getUserByUuidWithRolesRel(uuid);
 
     if (user.roles.findIndex((role) => role.id === roleId) !== -1) {
-      throw new Error(`User with email ${user.email} is already ${role.name}`);
+      throw new DuplicateMemberError(
+        `User with email ${user.email} is already ${role.name}`
+      );
     }
 
     user.roles.push(role);
-    return await userRepository.save(user);
+    return await AppDataSource.getRepository(User).save(user);
   }
 
   async removeRole(uuid: string, roleId: number): Promise<User> {
     const roleRepository = AppDataSource.getRepository(Role);
-    const role = await roleRepository.findOneOrFail({
-      where: { id: roleId },
-    });
+
+    await findOneOrFailTreated(roleRepository, roleId);
 
     const userRepository = AppDataSource.getRepository(User);
-    const user = await userRepository.findOneOrFail({
-      where: { uuid: uuid },
-      relations: ["roles"],
-    });
+    const user = await this.getUserByUuidWithRolesRel(uuid);
 
-    user.roles = user.roles.filter((userRole) => userRole.id !== role.id);
+    const roleIndex = user.roles.findIndex((role) => role.id === roleId);
+    if (roleIndex === -1) {
+      throw new MissingMemberError(
+        `User with uuid ${uuid} doesn't have role with id ${roleId}`
+      );
+    }
+
+    user.roles.splice(roleIndex, 1);
+
     return await userRepository.save(user);
   }
 
   async updateUser(uuid: string, updateUserDto: UpdateUserDto): Promise<User> {
     const userRepository = AppDataSource.getRepository(User);
-    const user = await userRepository.findOneOrFail({
-      where: { uuid },
-      relations: ["roles"],
-    });
+    const user = await this.getUserByUuidWithRolesRel(uuid);
     user.firstName = updateUserDto?.firstName ?? user.firstName;
     user.lastName = updateUserDto?.lastName ?? user.lastName;
     user.email = updateUserDto?.email ?? user.email;
     return await userRepository.save(user);
   }
 
-  async deleteUser(userId: number): Promise<void> {
-    await deleteById<User>(User, userId);
+  async deleteUser(userId: number): Promise<DeleteResult> {
+    return await deleteById<User>(User, userId);
   }
 
   async listUsers(
@@ -205,8 +224,8 @@ export class UserService {
     return newOrder;
   }
 
-  async deleteUserByEmail(email: string): Promise<void> {
-    await deleteByCriteria<User>(User, { email });
+  async deleteUserByEmail(email: string): Promise<UpdateResult> {
+    return await deleteByCriteria<User>(User, { email });
   }
 }
 

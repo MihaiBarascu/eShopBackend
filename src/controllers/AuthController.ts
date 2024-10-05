@@ -54,7 +54,7 @@ export class AuthController {
     if (!userId) {
       throw new Error("Invalid token");
     }
-    console.log("------------------");
+
     return await this.userServices.resetPassword(userId, newPass);
   };
 

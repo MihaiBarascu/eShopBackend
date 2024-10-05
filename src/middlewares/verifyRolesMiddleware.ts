@@ -7,8 +7,7 @@ export const verifyRoles = (...allowedRoles: number[]) => {
       return res.sendStatus(403);
     }
     const rolesArray: number[] = [...allowedRoles];
-    console.log(rolesArray);
-    console.log(req.roles);
+
     const result = req.roles
       .map((role) => rolesArray.includes(Number(role)))
       .find((val) => val === true);

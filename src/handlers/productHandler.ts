@@ -163,13 +163,11 @@ class ProductHandler {
 
   addImage = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      console.log("imageId", req.body.imageId);
-
       const productId = Number(req.params.productId);
       const imageId =
         req.body.imageId !== undefined ? Number(req.body.imageId) : undefined;
       const headers = req.headers as IncomingHttpHeaders;
-      console.log(imageId);
+
       if (isNaN(productId)) {
         return res.status(400).json({ error: "Invalid product ID" });
       }
@@ -177,7 +175,7 @@ class ProductHandler {
       const isMultipart = headers["content-type"]?.includes(
         "multipart/form-data"
       );
-      console.log(isMultipart);
+
       if (imageId === undefined && isMultipart) {
         const newImage = await this.productController.addNewImage(
           productId,

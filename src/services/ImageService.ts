@@ -208,7 +208,6 @@ class ImageService {
         foundImage.name
       );
 
-      console.log(deletePath);
       await fs.promises.unlink(deletePath);
       logInfo(`Image at path ${deletePath} deleted successfully`);
     } catch (err) {

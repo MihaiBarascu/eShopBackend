@@ -14,7 +14,6 @@ import { NonExistentIdError } from "../../src/errors/NonExistentIdError";
 import { DeleteResult, UpdateResult } from "typeorm";
 import { DuplicateMemberError } from "../../src/errors/DuplicateMemberError";
 import { MissingMemberError } from "../../src/errors/MissingMemberError";
-import { link } from "fs";
 
 jest.mock("../../src/database/data-source", () => ({
   AppDataSource: require("../database-for-tests/setupTestDatabase")
@@ -333,7 +332,7 @@ describe("ProductController", () => {
               });
             });
             describe("and the image is linked to the product", () => {
-              it("should delete the product-iamge relation and return the product with updated relation", async () => {
+              it("should delete the product-image relation and return the product with updated relation", async () => {
                 const productId = 1;
                 const linkedimageId = 1;
 
@@ -347,8 +346,8 @@ describe("ProductController", () => {
                   `SELECT * from product_images where image_id=${linkedimageId} and product_id=${productId}`
                 );
 
-                console.log("product", updatedProduct);
-                console.log("entry", productImageEntry);
+                expect(productImageEntry).toHaveLength(0);
+                expect(updatedProduct).toHaveProperty("id", productId);
               });
             });
           });

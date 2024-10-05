@@ -71,13 +71,28 @@ export const populateDatabase = async (AppDataSource: DataSource) => {
 
   try {
     await AppDataSource.query(`
-      INSERT INTO roles (uuid, name, description, createdAt, updatedAt) VALUES
-      ('a45b9a1c-6a4e-4e6c-9a8f-1f098bd4d3a5', 'Admin', 'Administrator with full access rights.', NOW(), NOW()),
-      ('b2c19458-5ef4-42b3-83e4-5b62145ab15d', 'User', 'Regular user with limited access.', NOW(), NOW()),
-      ('fdfcf44d-bac4-4cf7-8377-d5bb2a6f1c3a', 'Moderator', 'User with permissions to manage content.', NOW(), NOW());
+      INSERT INTO roles (uuid, name, description, createdAt, updatedAt, deletedAt) VALUES
+      ('a45b9a1c-6a4e-4e6c-9a8f-1f098bd4d3a5', 'Admin', 'Administrator with full access rights.', NOW(), NOW(), NULL),
+      ('b2c19458-5ef4-42b3-83e4-5b62145ab15d', 'User', 'Regular user with limited access.', NOW(), NOW(), NULL),
+      ('fdfcf44d-bac4-4cf7-8377-d5bb2a6f1c3a', 'Moderator', 'User with permissions to manage content.', NOW(), NOW(), NULL);
     `);
   } catch (error) {
     console.error("Error inserting roles:", error);
+  }
+  try {
+    await AppDataSource.query(`
+      INSERT INTO user (uuid, firstName, lastName, email, password, createdAt, updatedAt, deletedAt, refreshToken) VALUES
+      ('1a2b3c4d-5e6f-7g8h-9i0j-1k2l3m4n5o6p', 'John', 'Doe', 'john.doe@example.com', 'password123', NOW(), NOW(), NULL, 'refreshToken1'),
+      ('2b3c4d5e-6f7g-8h9i-0j1k-2l3m4n5o6p7q', 'Jane', 'Smith', 'jane.smith@example.com', 'password123', NOW(), NOW(), NULL, 'refreshToken2'),
+      ('some-uuid', 'Alice', 'Johnson', 'alice.johnson@example.com', 'password123', NOW(), NOW(), NULL, 'refreshToken3'),
+      ('4d5e6f7g-8h9i-0j1k-2l3m-4n5o6p7q8r9s', 'Bob', 'Brown', 'bob.brown@example.com', 'password123', NOW(), NOW(), NULL, 'refreshToken4'),
+       ('5e6f7g8h-9i0j-1k2l-3m4n-5o6p7q8r9s0t', 'Charlie', 'Davis', 'charlie.davis@example.com', 'password123', NOW(), NOW(), NULL, 'refreshToken5'),
+      ('6f7g8h9i-0j1k-2l3m-4n5o-6p7q8r9s0t1u', 'David', 'Miller', 'david.miller@example.com', 'password123', NOW(), NOW(), NULL, 'refreshToken6'),
+      ('7g8h9i0j-1k2l-3m4n-5o6p-7q8r9s0t1u2v', 'Eve', 'Wilson', 'eve.wilson@example.com', 'password123', NOW(), NOW(), NULL, 'refreshToken7'),
+      ('8h9i0j1k-2l3m-4n5o-6p7q-8r9s0t1u2v3w', 'Frank', 'Moore', 'frank.moore@example.com', 'password123', NOW(), NOW(), NULL, 'refreshToken8')
+    `);
+  } catch (error) {
+    console.error("Error inserting users:", error);
   }
 
   try {
@@ -89,6 +104,19 @@ export const populateDatabase = async (AppDataSource: DataSource) => {
     `);
   } catch (error) {
     console.error("Error inserting images:", error);
+  }
+
+  try {
+    await AppDataSource.query(`
+      INSERT INTO orders (uuid, userId, description, type, status, createdAt, updatedAt, deletedAt) VALUES
+      ('order-uuid-1', 1, 'Order for electronics', 'Online', 'Pending', NOW(), NOW(), NULL),
+      ('order-uuid-2', 2, 'Order for fashion items', 'In-Store', 'Completed', NOW(), NOW(), NULL),
+      ('order-uuid-3', 3, 'Order for home appliances', 'Online', 'Shipped', NOW(), NOW(), NULL),
+      ('order-uuid-4', 4, 'Order for books', 'Online', 'Cancelled', NOW(), NOW(), NULL),
+      ('order-uuid-5', 5, 'Order for toys', 'In-Store', 'Pending', NOW(), NOW(), NULL);
+    `);
+  } catch (error) {
+    console.error("Error inserting orders:", error);
   }
 };
 

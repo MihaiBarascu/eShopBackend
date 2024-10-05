@@ -171,13 +171,14 @@ export class CategoryService {
 
   async addCategory(prodId: number, categId: number) {
     try {
+      const prodRep = AppDataSource.getRepository(Product);
       const categRepo = AppDataSource.getRepository(Category);
 
       const foundCateg = await findOneOrFailTreated(categRepo, categId);
 
-      const prodWithRelations: Product = (
-        await get(Product, { id: prodId }, { categories: true })
-      ).data[0];
+      const prodWithRelations = await findOneOrFailTreated(prodRep, prodId, {
+        categories: true,
+      });
 
       const allreadyHaveCat = prodWithRelations.categories.findIndex(
         (category) => category.id === foundCateg.id
@@ -194,7 +195,7 @@ export class CategoryService {
     } catch (error) {
       if (
         error instanceof NotFoundError &&
-        error.message.includes("No entities found")
+        error.message.includes("entities found")
       ) {
         throw new NonExistentIdError(
           `Product with id ${prodId} doesn't exist in the database`

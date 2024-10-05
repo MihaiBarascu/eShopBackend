@@ -99,7 +99,7 @@ class OrderHandler {
       validateFields(req, { params: { orderId: "orderId" } });
 
       const orderId = Number(req.params.orderId);
-      console.log(orderId);
+
       const products = req.body.orderProducts;
 
       const result = await this.orderController.addProducts(orderId, products);

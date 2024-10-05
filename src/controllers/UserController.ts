@@ -5,6 +5,7 @@ import { PaginationResponse } from "../interfaces";
 import Order from "../database/entity/Order";
 import { CreateUserOrderDto } from "../dto/userOrder.dto";
 import SanitizedOrder from "../serializers/order";
+import { DeleteResult, UpdateResult } from "typeorm";
 
 export class UserController {
   private userService: UserService;
@@ -36,8 +37,8 @@ export class UserController {
     return await this.userService.updateUser(uuid, updateUserDto);
   };
 
-  deleteUser = async (userId: number): Promise<void> => {
-    await this.userService.deleteUser(userId);
+  deleteUser = async (userId: number): Promise<DeleteResult> => {
+    return await this.userService.deleteUser(userId);
   };
 
   listUsers = async (
@@ -90,8 +91,8 @@ export class UserController {
     return await this.userService.createOrder(userUuid, ordr);
   };
 
-  deleteUserByEmail = async (email: string): Promise<void> => {
-    await this.userService.deleteUserByEmail(email);
+  deleteUserByEmail = async (email: string): Promise<UpdateResult> => {
+    return await this.userService.deleteUserByEmail(email);
   };
 }
 

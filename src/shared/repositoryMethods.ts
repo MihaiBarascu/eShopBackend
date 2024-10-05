@@ -96,12 +96,21 @@ export const restoreById = async <T extends { id: number }>(
 export const deleteByCriteria = async <T extends object>(
   type: EntityTarget<T>,
   searchCriteria: FindOptionsWhere<T>
-): Promise<void> => {
+): Promise<UpdateResult> => {
   const repository = AppDataSource.getRepository(type);
+  try {
+    await repository.findOneOrFail({ where: searchCriteria });
 
-  await repository.findOneOrFail({ where: searchCriteria });
-
-  await repository.softDelete(searchCriteria);
+    return repository.softDelete(searchCriteria);
+  } catch (error) {
+    if (
+      error instanceof EntityNotFoundError &&
+      error.message.includes("not find any entity of type")
+    ) {
+      throw new NotFoundError(`${repository.metadata.targetName} not found`);
+    }
+    throw error;
+  }
 };
 
 export const get = async <T extends object>(
@@ -125,7 +134,7 @@ export const get = async <T extends object>(
   });
 
   if (values.length == 0) {
-    throw new NotFoundError("No entities found");
+    throw new NotFoundError(`${repository.metadata.targetName} not found`);
   }
 
   return {

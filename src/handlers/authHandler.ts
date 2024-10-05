@@ -103,10 +103,6 @@ class AuthHandler {
 
       const newAuthToken = await this.authController.refresh(refreshToken);
 
-      console.log(
-        this.authController.authService.validateAccessToken(newAuthToken)
-      );
-
       return res.status(200).json({ newAuthToken });
     } catch (error) {
       next(error);

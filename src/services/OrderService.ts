@@ -7,6 +7,8 @@ import Product from "../database/entity/Product";
 import OrderProducts from "../database/entity/OrderProducts";
 import { CreateOrderProductsDto } from "../dto/orderProducts.dto";
 import { transactionContext } from "../database/transactionContext";
+import findOneOrFailTreated from "../shared/treatedFindOneOrFailMethod";
+import { MissingMemberError } from "../errors/MissingMemberError";
 
 export class OrderService {
   private orderRepository = AppDataSource.getRepository(Order);
@@ -21,9 +23,7 @@ export class OrderService {
   }
 
   async getOrder(orderId: number): Promise<Order> {
-    return await this.orderRepository.findOneOrFail({
-      where: { id: orderId },
-    });
+    return await findOneOrFailTreated(this.orderRepository, orderId);
   }
 
   async listOrder(
@@ -37,9 +37,10 @@ export class OrderService {
     orderId: number,
     updateOrderDto: UpdateOrderDto
   ): Promise<Order> {
-    const orderToUpdate = await this.orderRepository.findOne({
-      where: { id: orderId },
-    });
+    const orderToUpdate = await findOneOrFailTreated(
+      this.orderRepository,
+      orderId
+    );
 
     if (!orderToUpdate) {
       throw new Error("Order not found");
@@ -54,9 +55,10 @@ export class OrderService {
   }
 
   async deleteOrder(orderId: number): Promise<void> {
-    const orderToDelete = await this.orderRepository.findOneOrFail({
-      where: { id: orderId },
-    });
+    const orderToDelete = await findOneOrFailTreated(
+      this.orderRepository,
+      orderId
+    );
 
     await this.orderRepository.softDelete({ id: orderId });
   }
@@ -69,9 +71,8 @@ export class OrderService {
       const orderRepository = transactionMangaer.getRepository(Order);
       const productRepository = transactionMangaer.getRepository(Product);
 
-      const order = await orderRepository.findOne({
-        where: { id: orderId },
-        relations: { orderProducts: true },
+      const order = await findOneOrFailTreated(this.orderRepository, orderId, {
+        orderProducts: true,
       });
 
       if (!order) {
@@ -153,13 +154,12 @@ export class OrderService {
     orderId: number,
     productId: number
   ): Promise<Order> {
-    const order = await this.orderRepository.findOne({
-      where: { id: orderId },
-      relations: { orderProducts: true },
+    const order = await findOneOrFailTreated(this.orderRepository, orderId, {
+      orderProducts: true,
     });
 
-    if (!order) {
-      throw new Error("Order not found");
+    if (!order.orderProducts) {
+      throw new MissingMemberError(`Order (${orderId}) has no products`);
     }
 
     const orderProducts = order.orderProducts.filter(
@@ -167,14 +167,13 @@ export class OrderService {
     );
 
     if (orderProducts.length === 0) {
-      throw new Error(`Product (${productId}) not found in order`);
+      throw new MissingMemberError(`Product (${productId}) not found in order`);
     }
 
-    const product = await this.productRepository.findOneBy({ id: productId });
-
-    if (!product) {
-      throw new Error(`Product (${productId}) not found`);
-    }
+    const product = await findOneOrFailTreated(
+      this.productRepository,
+      productId
+    );
 
     for (const orderProduct of orderProducts) {
       product.stock += orderProduct.quantity;
@@ -184,10 +183,14 @@ export class OrderService {
     await this.productRepository.save(product);
 
     order.orderProducts = order.orderProducts.filter(
-      (op) => op.productId !== productId && op.productId !== undefined
+      (op) =>
+        op.productId !== productId &&
+        op.productId !== undefined &&
+        op.orderId !== undefined
     );
 
-    console.log(order);
-    return await this.orderRepository.save(order);
+    const result = await this.orderRepository.save(order);
+
+    return result;
   }
 }
