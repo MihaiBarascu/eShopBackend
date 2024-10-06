@@ -13,7 +13,7 @@ export const transactionContext = async (
     return data;
   } catch (error) {
     await queryRunner.rollbackTransaction();
-    logError("transaction failed:", error);
+
     throw error;
   } finally {
     await queryRunner.release();

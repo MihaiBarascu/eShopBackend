@@ -15,18 +15,18 @@ export class CategoryController {
     this.categoryService = new CategoryService();
   }
 
-  listCategories = async (
+  async listCategories(
     offset: number | undefined = undefined,
     limit: number | undefined = undefined
-  ): Promise<PaginationResponse<Category>> => {
+  ): Promise<PaginationResponse<Category>> {
     return await this.categoryService.listCategories(offset, limit);
-  };
+  }
 
-  getCatById = async (id: number): Promise<Category> => {
+  async getCatById(id: number): Promise<Category> {
     return await this.categoryService.getCatById(id);
-  };
+  }
 
-  create = async (dto: CreateCategoryDto) => {
+  async create(dto: CreateCategoryDto) {
     try {
       return await this.categoryService.create(dto);
     } catch (error) {
@@ -40,19 +40,19 @@ export class CategoryController {
       }
       throw error;
     }
-  };
+  }
 
-  generateTree = async () => {
+  async generateTree() {
     const categories = await this.categoryService.listCategories();
     return this.categoryService.generateTree(categories.data);
-  };
+  }
 
-  generateHtmlList = async () => {
+  async generateHtmlList() {
     const categories = await this.categoryService.listCategories();
     return this.categoryService.generateHtmlTree(categories.data);
-  };
+  }
 
-  updateCategory = async (categId: number, categDto: UpdateCategoryDto) => {
+  async updateCategory(categId: number, categDto: UpdateCategoryDto) {
     try {
       return await this.categoryService.updateCategory(categId, categDto);
     } catch (error) {
@@ -66,13 +66,13 @@ export class CategoryController {
       }
       throw error;
     }
-  };
+  }
 
-  deleteCategoryById = async (categId: number) => {
+  async deleteCategoryById(categId: number) {
     return await this.categoryService.deleteCategoryById(categId);
-  };
+  }
 
-  restoreCategoryById = async (categId: number) => {
+  async restoreCategoryById(categId: number) {
     return await this.categoryService.restoreCategoryById(categId);
-  };
+  }
 }

@@ -8,4 +8,3 @@ export default {
   //cleanMOcks:true
   setupFiles: [path.join(__dirname, "./jest.setup.ts")],
 };
-
