@@ -97,9 +97,6 @@ export class OrderService {
   aggregateOrderProducts(
     orderProducts: CreateOrderProductsDto[]
   ): CreateOrderProductsDto[] {
-    console.log("----------------");
-    console.log(orderProducts);
-    console.log("----------------");
     return Object.values(
       orderProducts.reduce((acc, curr) => {
         if (acc[curr.productId]) {

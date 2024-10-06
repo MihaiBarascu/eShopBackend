@@ -4,7 +4,7 @@ import { ACCESS_TOKEN_SECRET } from "../utils/config";
 import { Response, NextFunction } from "express";
 import { extendedRequest } from "../utils/types";
 
-export default function verifyJWT(
+export default function verifyAccessToken(
   request: extendedRequest,
   response: Response,
   next: NextFunction
@@ -23,9 +23,8 @@ export default function verifyJWT(
     if (err) return response.sendStatus(403);
     request.email = (decoded as JwtPayload).UserInfo.email;
     request.roles = (decoded as JwtPayload).UserInfo.roles;
-    request.id = (decoded as JwtPayload).UserInfo.id;
     request.uuid = (decoded as JwtPayload).UserInfo.uuid;
-    console.log(request.email, request.roles, request.id);
+
     next();
   });
 }

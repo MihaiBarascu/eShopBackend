@@ -54,13 +54,14 @@ export class UserService {
     return await repository.save(user);
   }
 
-  async resetPassword(userId: number, newPass: string): Promise<User> {
-    const foundUser = await this.getUser(userId);
-    foundUser.password = await hashPassword(newPass);
+  async resetPassword(uuid: string, newPass: string): Promise<User> {
+    const foundUser = await this.getUserByUuid(uuid);
+
+    foundUser!.password = await hashPassword(newPass);
 
     const repository = AppDataSource.getRepository(User);
 
-    return await repository.save(foundUser);
+    return await repository.save(foundUser!);
   }
 
   async getUser(userId: number): Promise<User> {

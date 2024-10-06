@@ -16,9 +16,6 @@ export class UserOrderService {
   aggregateOrderProducts = (
     orderProducts: UserOrderProdDto[]
   ): UserOrderProdDto[] => {
-    console.log("----------------");
-    console.log(orderProducts);
-    console.log("----------------");
     return Object.values(
       orderProducts.reduce((acc, curr) => {
         if (acc[curr.productId]) {

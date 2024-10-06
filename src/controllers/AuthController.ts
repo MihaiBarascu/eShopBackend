@@ -4,7 +4,10 @@ import { User } from "../database/entity/User";
 import { checkPassword } from "../utils/checkPassword";
 import { UserService } from "../services/UserService";
 import { AuthService } from "../services/AuthService";
-import { JwtPayload } from "jsonwebtoken";
+import { JsonWebTokenError, JwtPayload, TokenExpiredError } from "jsonwebtoken";
+import { InvalidCredentialsError } from "../errors/InvalidCredentialsError";
+import { NotFoundError } from "../errors/NotFoundError";
+import { InvalidTokenError } from "../errors/InvalidTokenError";
 
 export class AuthController {
   name: string;
@@ -17,60 +20,86 @@ export class AuthController {
     this.authService = new AuthService();
   }
 
-  getResetPasswordToken = async (email: string) => {
+  getResetPasswordToken = async (email: string): Promise<string> => {
     const foundUser = await this.userServices.getUserByEmail(email);
-    if (!foundUser) {
-      throw new Error("Invalid email");
-    }
 
-    return this.authService.generatePasswordResetToken(foundUser);
+    return this.authService.generatePasswordResetToken(foundUser!);
   };
 
   loginAndGetTokens = async (loginData: LoginDto) => {
-    const { email, password } = loginData;
-    const foundUser = await this.userServices.getUserByEmailWithRoles(email);
+    try {
+      const { email, password } = loginData;
+      const foundUser = await this.userServices.getUserByEmailWithRoles(email);
 
-    if (!foundUser) {
-      throw new Error("Invalid email");
+      const isPasswordValid = await this.authService.checkPassword(
+        password,
+        foundUser!.password
+      );
+
+      if (!isPasswordValid) {
+        throw new InvalidCredentialsError(`Invalid email or password`);
+      }
+
+      return this.authService.authenticate(foundUser!);
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw new InvalidCredentialsError(`Invalid email or password`);
+      }
+      throw error;
     }
-    const isPasswordValid = await this.authService.checkPassword(
-      password,
-      foundUser.password
-    );
-
-    if (!isPasswordValid) {
-      throw new Error("Invalid password");
-    }
-
-    return this.authService.authenticate(foundUser);
   };
 
   resetPassword = async (token: string, newPass: string): Promise<User> => {
-    const decoded = this.authService.validateResetPasswordToken(
-      token
-    ) as JwtPayload;
+    try {
+      const decoded = this.authService.validateResetPasswordToken(
+        token
+      ) as JwtPayload;
 
-    const userId = decoded.id;
-    if (!userId) {
-      throw new Error("Invalid token");
+      const uuid = decoded.uuid;
+      if (!uuid) {
+        throw new InvalidTokenError(
+          "The provided reset password token is invalid "
+        );
+      }
+
+      return await this.userServices.resetPassword(uuid, newPass);
+    } catch (error) {
+      if (
+        (error instanceof JsonWebTokenError &&
+          error.message.includes("jwt malformed")) ||
+        error instanceof TokenExpiredError
+      ) {
+        throw new InvalidTokenError(
+          "The provided reset password token is invalid or expired"
+        );
+      }
+      throw error;
     }
-
-    return await this.userServices.resetPassword(userId, newPass);
   };
 
-  logout = async (refreshToken: string) => {
-    this.authService.deleteRefreshToken(refreshToken);
+  logout = async (refreshToken: string): Promise<User> => {
+    return await this.authService.deleteRefreshToken(refreshToken);
   };
 
   refresh = async (refreshToken: string): Promise<string> => {
-    this.authService.validateRefreshToken;
+    try {
+      this.authService.validateRefreshToken(refreshToken);
 
-    const foundUser = await this.authService.finUserByRefreshToken(
-      refreshToken
-    );
-    console.log(foundUser);
+      const foundUser = await this.authService.finUserByRefreshToken(
+        refreshToken
+      );
 
-    return this.authService.generateAccessToken(foundUser);
+      return this.authService.generateAccessToken(foundUser);
+    } catch (error) {
+      if (
+        (error instanceof JsonWebTokenError &&
+          error.message.includes("jwt malformed")) ||
+        error instanceof TokenExpiredError
+      ) {
+        throw new InvalidTokenError("Invalid or expired refresh token");
+      }
+      throw error;
+    }
   };
 }
 //produse utlizator categorii

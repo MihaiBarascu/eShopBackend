@@ -47,8 +47,6 @@ describe("UserController", () => {
           const userList: PaginationResponse<User> =
             await userController.listUsers(2, 3);
 
-          console.log("userList", userList);
-
           expect(userList).toHaveProperty("data");
           expect(userList).toHaveProperty("meta");
 
@@ -489,8 +487,6 @@ describe("UserController", () => {
             () => userController.getUserByEmail(email),
             NotFoundError
           );
-
-          console.log("delete result=", result);
         });
       });
 

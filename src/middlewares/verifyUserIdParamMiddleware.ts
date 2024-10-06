@@ -8,9 +8,6 @@ export const verifyUuidParamMiddleware = (
   next: NextFunction
 ) => {
   try {
-    console.log(req.params.uuid);
-    console.log("-----------");
-    console.log(req.uuid);
     const uuid = req.params.uuid;
     if (!req.roles?.includes(ROLES_LIST.Admin) && req.uuid !== uuid) {
       return res.status(403).json({ message: "You are not authorized" });

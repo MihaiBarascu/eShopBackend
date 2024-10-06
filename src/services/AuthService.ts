@@ -10,6 +10,7 @@ import { AppDataSource } from "../database/data-source";
 import { info, error as logErr } from "../utils/logger";
 import { compare, hash } from "bcrypt";
 import { randomBytes } from "crypto";
+import { InvalidTokenError } from "../errors/InvalidTokenError";
 
 export class AuthService {
   private accessTokenSecret: string;
@@ -28,7 +29,7 @@ export class AuthService {
     password: string,
     hashedPassword: string
   ): Promise<boolean> => {
-    return compare(password, hashedPassword);
+    return await compare(password, hashedPassword);
   };
 
   finUserByRefreshToken = async (refreshToken: string): Promise<User> => {
@@ -50,7 +51,6 @@ export class AuthService {
         UserInfo: {
           email: user.email,
           roles: uniqueRoleIds,
-          id: Number(user.id),
           uuid: user.uuid,
         },
       },
@@ -81,7 +81,7 @@ export class AuthService {
   generatePasswordResetToken = (user: User): string => {
     return jwt.sign(
       {
-        id: user.id,
+        uuid: user.uuid,
       },
       this.passwordResetTokenSecret,
       { expiresIn: "5m" }
@@ -119,16 +119,17 @@ export class AuthService {
     await AppDataSource.getRepository(User).save(user);
   };
 
-  deleteRefreshToken = async (refreshToken: string) => {
+  deleteRefreshToken = async (refreshToken: string): Promise<User> => {
     const foundUser = await AppDataSource.getRepository(User).findOneBy({
       refreshToken,
     });
 
     if (!foundUser) {
-      throw new Error("Invalid token");
+      throw new InvalidTokenError("Invalid token");
     }
+
     foundUser.refreshToken = randomBytes(32).toString("hex");
-    await AppDataSource.getRepository(User).save(foundUser);
+    return await AppDataSource.getRepository(User).save(foundUser);
   };
 
   authenticate = async (
