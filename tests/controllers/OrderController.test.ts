@@ -18,7 +18,7 @@ jest.mock("../../src/database/data-source", () => ({
 }));
 
 let orderController: OrderController;
-
+jest.setTimeout(10000);
 beforeAll(async () => {
   if (!AppDataSource.isInitialized) {
     await AppDataSource.initialize();

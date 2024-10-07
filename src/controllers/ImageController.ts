@@ -27,18 +27,15 @@ export class ImageController {
     return await this.imageService.saveImageNameInDatabase(pictureDetails);
   };
 
-
-  
-
-
-
-
   getImageDetailsFromDB = async (imageId: number) => {
     return await this.imageService.getImageFromDB(imageId);
   };
 
-  deleteImageFromMemory = async (imageId: number): Promise<void> => {
-    return await this.imageService.deleteImageFromMemory(imageId);
+  deleteImageFromMemory = async (
+    imageId: number,
+    location: string
+  ): Promise<void> => {
+    return await this.imageService.deleteImageFromMemory(imageId, location);
   };
 
   deleteImgFromDb = async (imageId: number): Promise<void> => {

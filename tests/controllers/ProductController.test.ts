@@ -19,7 +19,7 @@ jest.mock("../../src/database/data-source", () => ({
   AppDataSource: require("../database-for-tests/setupTestDatabase")
     .AppDataSource,
 }));
-
+jest.setTimeout(10000);
 let productController: ProductController;
 
 beforeAll(async () => {

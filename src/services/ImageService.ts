@@ -1,7 +1,6 @@
 import fs from "fs";
 import path from "path";
 import busboy from "busboy";
-import { Request } from "express";
 import { IncomingHttpHeaders } from "http";
 import { MAX_FILE_SIZE } from "../utils/config";
 import {
@@ -10,9 +9,7 @@ import {
   warn as logWarn,
 } from "../utils/logger";
 import { AppDataSource } from "../database/data-source";
-import Product from "../database/entity/Product";
 import Image from "../database/entity/Image";
-
 import { deleteById, getById } from "../shared/repositoryMethods";
 
 interface PictureDetails {
@@ -87,6 +84,7 @@ class ImageService {
 
     return new Promise((resolve, reject) => {
       bb.on("file", (name, file, info) => {
+        console.log("File event started");
         if (fileProcessed) {
           logWarn(`Multiple files are not allowed. ${info.filename} rejected`);
           file.resume();
@@ -169,6 +167,7 @@ class ImageService {
       });
 
       bb.on("close", () => {
+        console.log("Busboy close event");
         if (isError) {
           logError("File upload failed");
           reject(new Error("File upload failed"));
@@ -180,12 +179,14 @@ class ImageService {
       fileStream.pipe(bb);
     });
   }
+
   async addImage(
     headers: IncomingHttpHeaders,
     fileStream: NodeJS.ReadableStream,
     location: string = "images",
     description: string = ""
   ): Promise<Image> {
+    console.log("addImage started");
     const newImage = new Image();
 
     const details = await this.uploadPicture(headers, fileStream, location);
@@ -195,16 +196,20 @@ class ImageService {
     newImage.type = details.type;
     newImage.description = description;
 
+    console.log("addImage finished");
     return await AppDataSource.getRepository(Image).save(newImage);
   }
 
-  async deleteImageFromMemory(imageId: number): Promise<void> {
+  async deleteImageFromMemory(
+    imageId: number,
+    location: string = "images"
+  ): Promise<void> {
     try {
       const foundImage = await getById(Image, imageId);
 
       const deletePath = path.join(
         __dirname,
-        "../../uploads/images",
+        `../../uploads/${location}`,
         foundImage.name
       );
 

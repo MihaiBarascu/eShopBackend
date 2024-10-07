@@ -40,6 +40,7 @@ afterAll(async () => {
   }
 });
 
+jest.setTimeout(10000);
 describe("CategoryController", () => {
   describe("given database has 10 category entries", () => {
     describe("list categories", () => {

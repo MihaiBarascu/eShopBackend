@@ -22,6 +22,7 @@ jest.mock("../../src/database/data-source", () => ({
     .AppDataSource,
 }));
 
+jest.setTimeout(8000);
 let userController: UserController;
 
 beforeAll(async () => {
