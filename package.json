@@ -4,10 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
     "test": "jest --runInBand",
     "dev": "nodemon --legacy-watch",
     "typeorm": "typeorm-ts-node-commonjs -d src/database/data-source.ts",
-    "start": "",
+    "start": "npm run build && node dist/index.js",
     "migration:show": "npm run typeorm migration:show",
     "migration:create": "node scripts/migration-create.js",
     "migration:revert": "npm run typeorm migration:revert"
