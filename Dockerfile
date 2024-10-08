@@ -1,11 +1,31 @@
-FROM node:20.17.0
+FROM node:20-alpine as development
 
-WORKDIR /app
+ARG NODE_ENV=development
+ENV NODE_ENV=${NODE_ENV}
 
-COPY package*.json ./
+WORKDIR /usr/src/app
+
+COPY package*.json .
+COPY .env.development .
 
 RUN npm install
 
-RUN npm install -g ts-node
-
 COPY . .
+
+RUN npm run build
+
+FROM node:20-alpine as production
+
+ARG NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
+
+WORKDIR /usr/src/app
+
+COPY package*.json .
+COPY .env.production .
+
+RUN npm ci --only=production
+
+COPY --from=development /usr/src/app/dist ./dist
+
+CMD ["node","dist/index.js"]

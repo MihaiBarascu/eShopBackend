@@ -9,34 +9,21 @@ services:
       MYSQL_DATABASE: eShop
       MYSQL_USER: eShop
       MYSQL_PASSWORD: eShop
-    volumes:
-      - ./docker/mysql:/var/lib/mysql
     networks:
       - eShop
     ports:
       - "3308:3306"
+    volumes:
+      - mysql:/var/lib/mysql
 
-  app:
-    env_file: ./.env
+  api:
     build:
       context: .
-      dockerfile: Dockerfile
-    volumes:
-      - ./:/app
-      - /app/node_modules
-      - /app/tests
-    environment:
-      NODE_ENV: development
-      DB_HOST: mysql
-      DB_USERNAME: eShop
-      DB_PASSWORD: eShop
-      DB_DATANASE: eSHOP
-      SALT_ROUNDS: $SALT_ROUNDS
+      target: production
     depends_on:
       - mysql
-    command: npm run dev
     ports:
-      - "3000:3000"
+      - 3000:3000
     networks:
       - eShop
 

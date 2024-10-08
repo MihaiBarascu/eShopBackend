@@ -7,8 +7,8 @@ POST http://localhost:3000/categories/
 Content-Type: application/json
 
 {
-  "name": "Pantofi Sport",
-  "parentId": 13
+  "name": "Pantofi Sport"
+  
 }
 
 #############################################
