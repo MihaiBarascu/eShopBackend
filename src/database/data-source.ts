@@ -1,27 +1,63 @@
 import * as dotenv from "dotenv";
 import { DataSource } from "typeorm";
 import { info, error as logError } from "../utils/logger";
+import {
+  DB_HOST,
+  DB_PORT,
+  DB_USERNAME,
+  DB_PASSWORD,
+  DB_DATABASE,
+  DB_ENTITIES,
+  DB_MIGRATIONS,
+  MAX_RETRIES,
+  RETRY_DELAY,
+} from "../utils/config";
 
 dotenv.config();
-
+console.log(
+  DB_HOST,
+  DB_PORT,
+  DB_USERNAME,
+  DB_PASSWORD,
+  DB_DATABASE,
+  DB_ENTITIES,
+  DB_MIGRATIONS,
+  MAX_RETRIES
+);
 export const AppDataSource = new DataSource({
   type: "mysql",
-  host: process.env.DB_HOST || "127.0.0.1",
-  port: Number(process.env.DB_PORT) || 3306,
-  username: "root",
-  password: "root",
-  database: "eShop",
-  migrations: ["src/database/migrations/*.{js,ts}"],
+  host: DB_HOST,
+  port: Number(DB_PORT),
+  username: DB_USERNAME,
+  password: DB_PASSWORD,
+  database: DB_DATABASE,
+  migrations: [DB_MIGRATIONS],
   logging: process.env.ORM_LOGGING === "true",
-  entities: ["src/database/entity/**/*.{js,ts}"],
+  entities: [DB_ENTITIES],
   synchronize: true,
   subscribers: [],
 });
 
-AppDataSource.initialize()
-  .then(() => {
+async function initializeDataSource(
+  retries: number = Number(MAX_RETRIES)
+): Promise<void> {
+  try {
+    await AppDataSource.initialize();
     info("Data Source has been initialized");
-  })
-  .catch((error) => {
-    logError("Error during Data Source initialization:", error);
-  });
+  } catch (error) {
+    if (retries > 0) {
+      logError(
+        `Error during Data Source initialization. Retries left: ${retries}. Error:`,
+        error
+      );
+      setTimeout(() => initializeDataSource(retries - 1), Number(RETRY_DELAY));
+    } else {
+      logError(
+        "Error during Data Source initialization. No retries left:",
+        error
+      );
+    }
+  }
+}
+
+initializeDataSource();

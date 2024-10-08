@@ -15,28 +15,32 @@ import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import registerRouter from "./routes/register";
 import imagesRouter from "./routes/images";
+import { Router } from "express";
 
 const app: Express = express();
 
-app.use(express.json());
+const appRouter = Router();
 
-app.use(cookieParser());
+appRouter.use(express.json());
 
-app.use(morgan("dev"));
+appRouter.use(cookieParser());
 
-app.use(pagination);
+appRouter.use(morgan("dev"));
 
-app.use("/register", registerRouter);
-app.use("/auth", authRouter);
+appRouter.use(pagination);
 
-app.use("/users", usersRouter);
-app.use("/products", productsRouter);
-app.use("/categories", categoriesRouter);
-app.use("/orders", ordersRouter);
-app.use("/order-products", orderProductsRouter);
-app.use("/roles", rolesRouter);
-app.use("/permissions", permissionsRouter);
-app.use("/images", imagesRouter);
+appRouter.use("/register", registerRouter);
+appRouter.use("/auth", authRouter);
+
+appRouter.use("/users", usersRouter);
+appRouter.use("/products", productsRouter);
+appRouter.use("/categories", categoriesRouter);
+appRouter.use("/orders", ordersRouter);
+appRouter.use("/order-products", orderProductsRouter);
+appRouter.use("/roles", rolesRouter);
+appRouter.use("/permissions", permissionsRouter);
+appRouter.use("/images", imagesRouter);
+app.use("/api/v1", appRouter);
 
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: "unknown endpoint" });

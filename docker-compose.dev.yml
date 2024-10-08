@@ -1,0 +1,32 @@
+services:
+  mysql_dev:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: eShop
+      MYSQL_USER: eShop
+      MYSQL_PASSWORD: eShop
+    volumes:
+      - ./docker/mysql:/var/lib/mysql
+    networks:
+      - eShopDev
+    ports:
+      - "3309:3306"
+  api:
+    build:
+      context: .
+      target: development #TO RUN JUST DEV STAGE
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - 4000:4000
+    depends_on:
+      - mysql_dev
+    networks:
+      - eShopDev
+    command: npm run dev
+
+networks:
+  eShopDev:
+
