@@ -8,7 +8,7 @@
     "test": "jest --runInBand",
     "dev": "cross-env NODE_ENV=development ts-node-dev --poll src/index.ts",
     "typeorm": "typeorm-ts-node-commonjs -d src/database/data-source.ts",
-    "start": "npm run build && node dist/index.js",
+    "start": "cross-env NODE_ENV=production npm run build && node dist/index.js",
     "migration:show": "npm run typeorm migration:show",
     "migration:create": "node scripts/migration-create.js",
     "migration:revert": "npm run typeorm migration:revert"
